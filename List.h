@@ -106,11 +106,10 @@ namespace DataContainers {
 		}
 
 		~List() {
-			while (size > 0)
-				Remove(0);		
+			Clear();
 		}
 
-
+	
 		void PushBack(const type& elem);
 		void PushFront(const type& elem);
 		void Insert(const type& elem, unsigned int ind);
@@ -216,8 +215,6 @@ namespace DataContainers {
 
 	}
 
-
-
 	template<typename type>
 	type List<type>::PopBack() {
 		assert(size > 0 && "List is empty");
@@ -228,6 +225,7 @@ namespace DataContainers {
 			head = nullptr;
 			return data;
 		}
+
 		if (size == 2) {
 			size--;
 			type& data = tail->Data;
@@ -237,6 +235,7 @@ namespace DataContainers {
 		}
 
 		type& data = tail->Data;
+
 		auto current = tail;
 		current = current->Previous;
 		current->Next = nullptr;

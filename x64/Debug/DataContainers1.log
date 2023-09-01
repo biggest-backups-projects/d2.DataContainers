@@ -1,0 +1,7 @@
+﻿  Main.cpp
+C:\Users\clash\Main\Programming\DataContainers\Main.cpp(15,17): warning C4267: 'argument': conversion from 'size_t' to 'const type', possible loss of data
+          with
+          [
+              type=int
+          ]
+  DataContainers1.vcxproj -> C:\Users\clash\Main\Programming\DataContainers\x64\Debug\DataContainers.exe

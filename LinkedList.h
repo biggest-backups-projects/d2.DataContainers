@@ -41,12 +41,6 @@ namespace DataContainers {
 			}
 		}
 
-		template<typename type>
-		LinkedList(const initializer_list<type> _arr) {
-			for (size_t i = 0; i < _arr.size(); i++)
-				PushFront(*(_arr.end() - i - 1));
-		}
-
 		~LinkedList() {
 			Сlear();
 		}
@@ -81,6 +75,8 @@ namespace DataContainers {
 		unsigned int Size() const;
 		bool Empty() const;
 		void Сlear();
+
+		
 
 	};
 

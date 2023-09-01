@@ -26,7 +26,6 @@ namespace DataContainers{
 		char* operator +(const char* str);
 
 		void operator +=(const char* str);
-
 		void operator +=(String str);
 		String& operator =(const char* str);
 		String& operator =(String str);

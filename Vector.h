@@ -1,8 +1,8 @@
 #pragma once
 #include <functional>
+#include <iostream>
 
-namespace DataContainers
-{
+namespace DataContainers {
 	template<typename type>
 	class Vector
 	{
@@ -11,50 +11,15 @@ namespace DataContainers
 		unsigned int size;
 		unsigned int capacity;
 
-		void SetCapacity(int value = -1) {
-			if (value == -1)
-				capacity *= 2;
-
-			type* newData = new type[capacity];
-
-			if(size != 0) {
-				for (unsigned int i = 0; i < size; i++)
-					newData[i] = data[i];
-
-				delete data;
-			}
-			data = newData;
-		}
+		void SetCapacity(int value = -1);
 	public:
 
-		Vector() {
-			size = 0;
-			capacity = 8;
-			data = new type[capacity];
-		}
-
-		Vector(const List<type>& list) {
-			for (unsigned int i = 0; i < list.Size(); i++)
-				PushBack(list[i]);
-		}
-
-		Vector(const initializer_list<type> _arr) {
-			for (size_t i = 0; i < _arr.size(); i++)
-				PushFront(*(_arr.end() - i - 1));
-		}
-
+		Vector();
+		Vector(const Vector<type>& list);
+		Vector(const std::initializer_list<type> _arr);
 		~Vector() {
 			Clear();
 		}
-
-		type* begin() const {
-			return data;
-		}
-
-		type* end() const {
-			return data+size;
-		}
-
 
 		void PushBack(const type& elem) {
 			if (size == capacity)
@@ -109,7 +74,7 @@ namespace DataContainers
 			for (size_t i = 0; i < size; i++)
 				function(data[i]);
 		}
-		Vector<type> Filter(const function<bool(type)>& predicate) {
+		Vector<type> Filter(const std::function<bool(type)>& predicate) {
 			Vector<type> result;
 			for (size_t i = 0; i < size; i++) {
 				if (predicate(data[i]))
@@ -117,6 +82,7 @@ namespace DataContainers
 			}
 			return result;
 		}
+
 
 		[[nodiscard]]
 		type PopBack() {
@@ -181,14 +147,18 @@ namespace DataContainers
 			
 		}
 
-
+		[[nodiscard]]
 		type At(unsigned int ind) const {
 			assert(ind < size && "Index out of range");
 			return data[ind];
 		}
+		[[nodiscard]]
 		type operator[](unsigned int ind) const {
 			return At(ind);
 		}
+
+		type* begin() const;
+		type* end() const;
 		void Clear() {
 			delete data;
 			data = nullptr;
@@ -204,4 +174,5 @@ namespace DataContainers
 
 	};
 
+	
 }

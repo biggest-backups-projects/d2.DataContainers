@@ -15,11 +15,6 @@ int main() {
 		test.PushBack(i);
 	}
 
-
-	for(auto& i : test) {
-		cout << i << " ";
-	}
-
 	/*test.Filter([](int i) { return i % 2 == 0; })
 	.ForEach([](int i) { std::cout << i << std::endl; });*/
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include <cassert>
 #include <functional>
 #include <iostream>
 
@@ -11,26 +12,50 @@ namespace DataContainers {
 		unsigned int size;
 		unsigned int capacity;
 
-		void SetCapacity(int value = -1);
+		void setCapacity(int value = -1) {
+			if (value == -1)
+				capacity *= 2;
+
+			type* newData = new type[capacity];
+
+			if (size != 0) {
+				for (unsigned int i = 0; i < size; i++)
+					newData[i] = data[i];
+
+				delete data;
+			}
+			data = newData;
+		}
 	public:
 
-		Vector();
-		Vector(const Vector<type>& list);
-		Vector(const std::initializer_list<type> _arr);
+		Vector() {
+			size = 0;
+			capacity = 8;
+			data = new type[capacity];
+		}	
+		Vector(const Vector<type>& list) {
+			for (unsigned int i = 0; i < list.Size(); i++)
+				PushBack(list[i]);
+		}
+		Vector(const std::initializer_list<type> _arr) : Vector() {
+			for (const auto& elem : _arr)
+				PushBack(elem);
+		}
+
 		~Vector() {
 			Clear();
 		}
 
 		void PushBack(const type& elem) {
 			if (size == capacity)
-				SetCapacity();
+				setCapacity();
 
 			data[size] = elem;
 			size++;
 		}
 		void PushFront(const type& elem) {
 			if (size == capacity)
-				SetCapacity();
+				setCapacity();
 
 
 			type* newData = new type[capacity];
@@ -43,14 +68,14 @@ namespace DataContainers {
 			data = newData;
 			size++;
 		}
-		void Insert(const type& elem, unsigned int ind)	{
+		void Insert(const type& elem, unsigned ind) {
 
 			if (ind == 0)
 				return PushFront(elem);
 			if (ind == size - 1)
 				return PushBack(elem);
 			if (size == capacity)
-				SetCapacity();
+				setCapacity();
 
 			type* newData = new type[capacity];
 
@@ -106,7 +131,7 @@ namespace DataContainers {
 			return result;
 		}
 		[[nodiscard]]
-		type Pop(unsigned int ind) {
+		type Pop(unsigned ind) {
 			assert(ind < size && "Index out of range");
 			if (ind == 0)
 				return PopFront();
@@ -128,7 +153,16 @@ namespace DataContainers {
 			size--;
 			return result;
 		}
-		void Remove(unsigned int ind) {
+		[[nodiscard]]
+		type At(unsigned int ind) const {
+			assert(ind < size && "Index out of range");
+			return data[ind];
+		}
+		[[nodiscard]]
+		type operator[](unsigned ind) const {
+			return At(ind);
+		}
+		void Remove(unsigned ind) {
 			assert(ind < size && "Index out of range");
 
 			type* newData = new type[capacity];
@@ -144,23 +178,19 @@ namespace DataContainers {
 			delete[] data;
 			data = newData;
 			size--;
-			
 		}
 
-		[[nodiscard]]
-		type At(unsigned int ind) const {
-			assert(ind < size && "Index out of range");
-			return data[ind];
+
+		type* begin() const {
+			return data;
 		}
-		[[nodiscard]]
-		type operator[](unsigned int ind) const {
-			return At(ind);
+		type* end() const {
+			return data + size;
 		}
 
-		type* begin() const;
-		type* end() const;
+
 		void Clear() {
-			delete data;
+			delete[] data;
 			data = nullptr;
 			size = 0;
 
@@ -171,7 +201,6 @@ namespace DataContainers {
 		unsigned int Size() const {
 			return size;
 		}
-
 	};
 
 	

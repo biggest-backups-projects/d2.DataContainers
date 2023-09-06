@@ -94,6 +94,26 @@ namespace DataContainers {
 		#endif
 		}
 	public:
+		struct Iterator
+		{
+			using iterator_category = std::forward_iterator_tag;
+			using difference_type = std::ptrdiff_t;
+			using value_type = type;
+			using pointer = type*;
+			using reference = type&;
+
+			Iterator(pointer ptr) : m_ptr(ptr) {}
+
+		
+			pointer operator->() { return m_ptr; }
+			Iterator& operator++() { m_ptr = m_ptr->Next; return *this; }
+			friend bool operator== (const Iterator& a, const Iterator& b) { return a.m_ptr == b.m_ptr; };
+			friend bool operator!= (const Iterator& a, const Iterator& b) { return a.m_ptr != b.m_ptr; };
+
+		private:
+			Node* m_ptr;
+		};
+
 		List() {
 			this->head = nullptr;
 			this->tail = nullptr;
@@ -109,8 +129,12 @@ namespace DataContainers {
 			Clear();
 		}
 
+		Iterator begin() { return Iterator(&head); }
+		Iterator end() { return Iterator(&tail); }
+
 	
 		void PushBack(const type& elem);
+		void PushBack(const List<type>& lst);
 		void PushFront(const type& elem);
 		void Insert(const type& elem, unsigned int ind);
 
@@ -154,6 +178,12 @@ namespace DataContainers {
 		tail = newElem;
 
 		size++;
+	}
+
+	template<typename type>
+	void List<type>::PushBack(const List<type>& lst) {
+		for (size_t i = 0; i < lst.Size(); i++)
+			PushBack(lst[i]);
 	}
 
 	template<typename type>
@@ -325,7 +355,6 @@ namespace DataContainers {
 		delete current;
 		return data;
 	}
-
 
 
 	template<typename type>

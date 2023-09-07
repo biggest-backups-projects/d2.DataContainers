@@ -57,13 +57,10 @@ namespace DataContainers {
 				else
 					node->Height = rightHeight + 1;
 
-
 				if (node->Parent != nullptr)
 					UpdateHeight(node->Parent);
 	
 				Balance(node);
-				
-					
 			}
 
 			int GetHeight(Node* node) {
@@ -83,7 +80,7 @@ namespace DataContainers {
 			}
 
 			void RightRotate(Node* node = nullptr) {
-				if (node == nullptr)
+				if (!node)
 					node = this;
 
 				Node::Swap(node, node->Left);
@@ -104,6 +101,7 @@ namespace DataContainers {
 
 			/*	if(node->Right->Right != nullptr)
 					node->Right->Right->UpdateHeight();*/
+
 				if (node->Right != nullptr)
 					node->Right->UpdateHeight();
 
@@ -114,7 +112,7 @@ namespace DataContainers {
 			}
 
 			void LeftRotate(Node* node = nullptr) {
-				if (node == nullptr)
+				if (!node)
 					node = this;
 
 				Node::Swap(node, node->Right);
@@ -130,23 +128,15 @@ namespace DataContainers {
 				node->Left->Right = node->Left->Left;
 				node->Left->Left = nodeRight;
 
-				//if (node->Left->Left != nullptr)
-				//	node->Left->Left->Parent = node->Left;
+				if (node->Left->Left != nullptr)
+					node->Left->Left->Parent = node->Left;
 
 				if (node->Left != nullptr)
 					node->Left->UpdateHeight();
-				else
-				{
-					if (node->Left->Left != nullptr)
-						node->Left->Left->UpdateHeight();
-
-					if (node->Left->Right != nullptr)
-						node->Left->Right->UpdateHeight();
-				}
 			}
 
 			void Balance(Node* node = nullptr) {
-				if (node == nullptr)
+				if (!node)
 					node = this;
 				const int balance = node->GetBalance();
 				if(balance <= -2) {
@@ -170,16 +160,6 @@ namespace DataContainers {
 		unsigned int size;
 		unsigned int spacing = 3;
 
-		int heightOfTree(Node* root)
-		{
-			if (root == nullptr) {
-				return 0;
-			}
-			return 1
-				+ max(heightOfTree(root->Left),
-					heightOfTree(root->Right));
-		}
-
 		void printSpace(double n, Node* node) {
 
 			while(n>0) {
@@ -187,7 +167,7 @@ namespace DataContainers {
 				n--;
 			}
 
-			if (node == nullptr)
+			if (!node)
 				cout << " ";
 			else
 				cout << node->Data.Key << ": " << node->Height;
@@ -203,7 +183,7 @@ namespace DataContainers {
 		}
 
 		void Insert(Pair<type1, type2> pair, Node* node = nullptr) {
-			if(root == nullptr) {
+			if(!root) {
 				Node* newNode = new Node(pair);
 				root = newNode;
 				size++;
@@ -219,8 +199,8 @@ namespace DataContainers {
 				{
 					node->Left = new Node(pair, node);
 					node->Left->UpdateHeight();
-					PrintFormat();
-					cout << "\n\n\n\n\n";
+					/*PrintFormat();
+					cout << "\n\n\n\n\n";*/
 					size++;
 				}
 				else
@@ -231,8 +211,8 @@ namespace DataContainers {
 				{
 					node->Right = new Node(pair, node);
 					node->Right->UpdateHeight();
-					PrintFormat();
-					cout << "\n\n\n\n\n";
+				/*	PrintFormat();
+					cout << "\n\n\n\n\n";*/
 					size++;
 				}
 				else
@@ -241,31 +221,30 @@ namespace DataContainers {
 		}
 
 		Node* GetMin(Node* node = nullptr) {
-			if (node == nullptr)
+			if (!node)
 				node = root;
-			if (node->Left == nullptr)
+			if (!node->Left)
 				return node;
 			return GetMin(node->Left);
 		}
 
 		Node* GetMax(Node* node = nullptr) {
-			if (node == nullptr)
+			if (!node)
 				node = root;
-			if (node->Right == nullptr)
+			if (!node->Right)
 				return node;
 			return GetMax(node->Right);
 		}
 
 		void Delete(const type1& key, Node* node = nullptr) {
-			if (node == nullptr)
+			if (!node)
 				node = root;
 
 			if (key < node->Data.Key)
 				Delete(key, node->Left);
- 			else if (key > node->Data.Key)
+			else if (key > node->Data.Key)
 				Delete(key, node->Right);
 			else {
-				int bal = node->GetBalance();
 				if (node->Left != nullptr && node->Right != nullptr) {
 					Node* maxLeft = GetMax(node->Left);
 
@@ -341,7 +320,7 @@ namespace DataContainers {
 		}
 
 		void Clear(Node* node = nullptr) {
-			if (node == nullptr)
+			if (!node)
 				node = root;
 
 			if(node->Left != nullptr)
@@ -354,7 +333,7 @@ namespace DataContainers {
 		}
 
 		void ForEach(const function<void(type2 i)>& function, Node* node = nullptr) {
-			if (node == nullptr)
+			if (!node)
 				node = root;
 
 			if(node->Left != nullptr)
@@ -370,35 +349,30 @@ namespace DataContainers {
 			return size;
 		}
 
-		bool Contains(const type1& key, Node* node = nullptr) {
-			if (node == nullptr)
+		bool Contains(const type1& key, Node* node = nullptr) const {
+			if (!node)
 				node = root;
 
-			if (node->Left != nullptr)
-				if (Contains(key, node->Left))
-					return true;
-
-			if (key == node->Data.Key)
+			if(node->Left && Contains(key, node->Left))
 				return true;
 
-			if (node->Right != nullptr)
-				if (Contains(key, node->Right))
-					return true;
+			if (node->Right && Contains(key, node->Right))
+				return true;
 
-			return false;
+			return key == node->Data.Key;
 		}
 
-		void PrintFormat(Node* root = nullptr) {
-			if (root == nullptr)
-				root = this->root;
+		void PrintFormat(Node* node = nullptr) {
+			if (!node)
+				node = this->root;
 
 			queue<Node*> treeLevel, temp;
-			treeLevel.push(root);
+			treeLevel.push(node);
 			int counter = 0;
-			int height = heightOfTree(root);
+			int height = node->Height+1;
 
 			//double elementsCount = pow(2, (height + 1)) - 1;
-			double elementsCount = this->size+spacing;
+			int elementsCount = this->size+spacing;
 
 			while (counter <= height) {
 				Node* removed = treeLevel.front();
@@ -433,13 +407,25 @@ namespace DataContainers {
 			}
 		}
 
-		//List<int> Keys(List<int>* keys = nullptr) {
-		//	if (keys == nullptr)
-		//		keys = new List<int>();
+		Vector<type1> Keys() const {
+			auto result = Vector<type1>(size);
+			FindKeys(result, root);
+			return result;
+			
+		}
 
-		//	return List<int>(keys);
-		//	
-		//}
+		void FindKeys(Vector<type1>& vector, Node* node = nullptr) const {
+			if (!node)
+				node = root;
+
+			if (node->Left)
+				FindKeys(vector, node->Left);
+
+			vector.PushBack(node->Data.Key);
+
+			if (node->Right)
+				FindKeys(vector, node->Right);
+		}
 
 	};
 }

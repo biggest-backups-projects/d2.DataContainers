@@ -28,9 +28,8 @@ namespace DataContainers {
 		}
 	public:
 
-		Vector() {
-			size = 0;
-			capacity = 8;
+		Vector(unsigned int capacity = 8) :
+			capacity(capacity),	size(0) {
 			data = new type[capacity];
 		}	
 		Vector(const Vector<type>& list) {
@@ -52,6 +51,15 @@ namespace DataContainers {
 
 			data[size] = elem;
 			size++;
+		}
+		void PushBack(const Vector<type>& vector) {
+			if (size+vector.Size() > capacity)
+				setCapacity(size + vector.Size());
+
+			for (size_t i = size; i < size + vector.Size(); i++)
+				data[i] = vector[i - size];
+
+			size += vector.Size();
 		}
 		void PushFront(const type& elem) {
 			if (size == capacity)

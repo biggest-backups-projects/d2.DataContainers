@@ -199,8 +199,8 @@ namespace DataContainers {
 				{
 					node->Left = new Node(pair, node);
 					node->Left->UpdateHeight();
-					/*PrintFormat();
-					cout << "\n\n\n\n\n";*/
+					PrintFormat();
+					cout << "\n\n\n\n\n";
 					size++;
 				}
 				else
@@ -211,8 +211,8 @@ namespace DataContainers {
 				{
 					node->Right = new Node(pair, node);
 					node->Right->UpdateHeight();
-				/*	PrintFormat();
-					cout << "\n\n\n\n\n";*/
+					PrintFormat();
+					cout << "\n\n\n\n\n";
 					size++;
 				}
 				else
@@ -425,6 +425,28 @@ namespace DataContainers {
 
 			if (node->Right)
 				FindKeys(vector, node->Right);
+		}
+
+		Vector<Pair<type1, type2>> Filter(const function<bool(Pair<type1, type2>)>& predicate) {
+			auto result = Vector<Pair<type1, type2>>(size);
+			Foo(result, predicate, root);
+			return result;
+		}
+
+		void Foo(Vector<Pair<type1, type2>>& vector,
+				 const function<bool(Pair<type1, type2>)>& predicate,
+				 Node* node = nullptr) {
+			if (!node)
+				node = root;
+
+			if (node->Left)
+				Foo(vector, predicate, node->Left);
+
+			if(predicate(node->Data))
+				vector.PushBack(node->Data);
+
+			if (node->Right)
+				Foo(vector, predicate, node->Right);
 		}
 
 	};

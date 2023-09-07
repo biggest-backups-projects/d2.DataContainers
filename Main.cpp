@@ -24,10 +24,10 @@ int main() {
 	Dictionary<int, int> dict;
 	//Vector<unsigned int> keys = { 10, 50, 5, 8, 3, 60, 40, 9, 35, 30, 45, 37, 4, 2};
 	//Vector<unsigned int> keys = {100, 4, 5, 2, 3, 1, 0, 11, 22, 15, 17, 25};
-
-	for(unsigned int i = 1; i < 20; i++) {
+	Vector<unsigned int> keys = { 3, 5, 7, 8, 9 };
+	for(const auto& key : keys) {
 		//cout << keys[i] << endl;
-		dict.Insert(Pair<int, int>(i, i));
+		dict.Insert(Pair<int, int>(key, key));
 	}
 	cout << "\n\n\n";
 	
@@ -37,16 +37,21 @@ int main() {
 	//dict.Delete(40);	
 	//dict.Print();
 
-	for(const auto& elem : dict.Keys())
-		cout << elem << " ";
+	//for(const auto& elem : dict.Keys())
+	//	cout << elem << " ";
 
-	cout << "\n\n\n";
+	//cout << "\n\n\n";
 
-	cout << dict.Contains(2);
+	//cout << dict.Contains(2);
+	//
+	//cout << "\n\n\n";
+
+	//dict.ForEach([](int key) { cout << key << " "; });
+
+	auto res = dict.Filter([](Pair<int, int> elem) { return elem.Key % 2 == 0; });
+	for (const auto& elem : res)
+		cout << elem.Key << " ";
 	
-	cout << "\n\n\n";
-
-	dict.ForEach([](int key) { cout << key << " "; });
 
 
 

@@ -98,7 +98,9 @@ namespace DataContainers {
 
 				node->Right->Left = node->Right->Right;
 				node->Right->Right = nodeRight;
-				
+
+				if (node->Right->Right != nullptr)
+					node->Right->Right->Parent = node->Right;
 
 			/*	if(node->Right->Right != nullptr)
 					node->Right->Right->UpdateHeight();*/
@@ -128,6 +130,9 @@ namespace DataContainers {
 				node->Left->Right = node->Left->Left;
 				node->Left->Left = nodeRight;
 
+				//if (node->Left->Left != nullptr)
+				//	node->Left->Left->Parent = node->Left;
+
 				if (node->Left != nullptr)
 					node->Left->UpdateHeight();
 				else
@@ -144,17 +149,15 @@ namespace DataContainers {
 				if (node == nullptr)
 					node = this;
 				const int balance = node->GetBalance();
-				if(balance == -2) {
+				if(balance <= -2) {
 					if (node->Left->GetBalance() == 1)
 						node->Left->LeftRotate();
 					node->RightRotate();
 					
-				}else if(balance == 2) {
-					if (node->Right->GetBalance() == -1) {
+				}else if(balance >= 2) {
+					if (node->Right->GetBalance() == -1)
 						node->Right->RightRotate();
-						
-					}
-						
+
 					node->LeftRotate();
 				}
 				

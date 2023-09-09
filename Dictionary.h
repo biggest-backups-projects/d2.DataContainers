@@ -2,7 +2,8 @@
 #include <type_traits>
 #include <iostream>
 #include <queue>
-
+#include <format>
+#include <math.h>
 
 namespace DataContainers {
 	template<typename type1, typename type2, typename = std::enable_if_t<std::is_arithmetic_v<type1>>>
@@ -158,7 +159,7 @@ namespace DataContainers {
 
 		Node* root;
 		unsigned int size;
-		unsigned int spacing = 3;
+	
 
 		void printSpace(double n, Node* node) {
 
@@ -171,53 +172,6 @@ namespace DataContainers {
 				cout << " ";
 			else
 				cout << node->Data.Key << ": " << node->Height;
-		}
-	public:
-		Dictionary() {
-			root = nullptr;
-			size = 0;
-		}
-
-		~Dictionary() {
-			Clear();
-		}
-
-		void Insert(Pair<type1, type2> pair, Node* node = nullptr) {
-			if(!root) {
-				Node* newNode = new Node(pair);
-				root = newNode;
-				size++;
-
-				return;
-			}
-
-			if (node == nullptr)
-				node = root;
-
-			if(pair.Key < node->Data.Key) {
-				if (node->Left == nullptr)
-				{
-					node->Left = new Node(pair, node);
-					node->Left->UpdateHeight();
-					PrintFormat();
-					cout << "\n\n\n\n\n";
-					size++;
-				}
-				else
-					return Insert(pair, node->Left);
-			}
-			else {
-				if (node->Right == nullptr)
-				{
-					node->Right = new Node(pair, node);
-					node->Right->UpdateHeight();
-					PrintFormat();
-					cout << "\n\n\n\n\n";
-					size++;
-				}
-				else
-					return Insert(pair, node->Right);
-			}
 		}
 
 		Node* GetMin(Node* node = nullptr) {
@@ -234,6 +188,192 @@ namespace DataContainers {
 			if (!node->Right)
 				return node;
 			return GetMax(node->Right);
+		}
+
+		void DEBUG(string str) {
+			cout << "DEBUG: " << str << endl;
+		}
+
+		// DO NOT WORK!
+		void GoodPrint(function<string(Pair<type1, type2>)> func, uint32_t sp = 2) {
+			const uint32_t spacing = sp;
+			uint32_t width = pow(2, root->Height) * spacing;
+
+
+			const auto& lastLayer = GetLayer(0);
+			int contentSize = 0;
+
+			if (size > 1) {
+				for (Node* elem : lastLayer) {
+
+					if (elem)
+						contentSize += std::format("{}", elem->Data.Key).size();
+
+					if (elem == nullptr)
+						DEBUG("null");
+					else
+						DEBUG(format("{}", elem->Data.Key));
+				}
+				cout << "\n\n\n";
+			}
+
+
+			const uint32_t rootOffset = ceil(format("{}", root->Data.Key).size() / 2);
+			const uint32_t maxWith = width + contentSize;
+			const uint32_t rootSpacing = maxWith / 2 - rootOffset;
+
+
+
+			// Print root key
+			for (uint32_t i = 0; i < rootSpacing; i++)
+				cout << "\t";
+			cout << root->Data.Key;
+
+
+			int current = root->Height - 1;
+			uint32_t num = 1;
+			// Print body
+			while (current >= 0) {
+				cout << "\n\n";
+
+				//const uint32_t layerSpacing = pow(2, current == 0 ? 1 : current);
+
+				const auto& elements = GetLayer(current);
+				unsigned int maxHeight = 0;
+				for (const auto& elem : elements)
+					if (elem && elem->Parent->Height > maxHeight)
+						maxHeight = elem->Parent->Height;
+
+				const uint32_t layerSpacing = pow(2, maxHeight);
+				for (size_t i = 0; i < abs(int(rootSpacing - num)); i++)
+					cout << "\t";
+
+				for (uint32_t i = 0; i < elements.Size(); i++) {
+					if (elements[i])
+						cout << elements[i]->Data.Key;
+					else
+						cout << " ";
+
+					for (size_t j = 0; j < layerSpacing; j++)
+						cout << "\t";
+
+					/*if(i % 2 == 0 && i != 0)
+						cout << "\t";*/
+
+				}
+
+				num++;
+				current--;
+			}
+
+			int i = 0;
+
+		}
+
+		Vector<Node*> GetLayer(int layer) {
+			auto result = Vector<Node*>(size);
+			NodesLayer(layer, result, root, root->Height);
+			return result;
+		}
+
+		void NodesLayer(int layer, Vector<Node*>& vector, Node* node = nullptr, int pos = 0) {
+
+			if (node == nullptr) {
+				node = root;
+				pos = node->Height;
+			}
+
+			if (pos == layer) {
+				vector.PushBack(node);
+				return;
+			}
+
+			pos -= 1;
+			if (node->Left)
+				NodesLayer(layer, vector, node->Left, pos);
+			else if (pos == layer)
+				vector.PushBack(nullptr);
+
+			if (node->Right)
+				NodesLayer(layer, vector, node->Right, pos);
+			else if (pos == layer)
+				vector.PushBack(nullptr);
+		}
+
+		void filter(Vector<Pair<type1, type2>>& vector,
+			const function<bool(Pair<type1, type2>)>& predicate,
+			Node* node = nullptr) {
+			if (!node)
+				node = root;
+
+			if (node->Left)
+				filter(vector, predicate, node->Left);
+
+			if (predicate(node->Data))
+				vector.PushBack(node->Data);
+
+			if (node->Right)
+				filter(vector, predicate, node->Right);
+		}
+
+		void forEach(Vector<type1>& vector, Node* node = nullptr) const {
+			if (!node)
+				node = root;
+
+			if (node->Left)
+				forEach(vector, node->Left);
+
+			vector.PushBack(node->Data.Key);
+
+			if (node->Right)
+				forEach(vector, node->Right);
+		}
+	public:
+		Dictionary() {
+			root = nullptr;
+			size = 0;
+		}
+		~Dictionary() {
+			Clear();
+		}
+
+
+		void Insert(type1 key, type2 value, Node* node = nullptr) {
+			if(!root) {
+				Node* newNode = new Node(Pair<type1, type2>(key, value));
+				root = newNode;
+				size++;
+				GoodPrint(nullptr);
+				cout << "\n\n\n\n\n";
+				return;
+			}
+
+			if (node == nullptr)
+				node = root;
+
+			if(key < node->Data.Key) {
+				if (node->Left == nullptr) {
+					node->Left = new Node(Pair<type1, type2>(key, value), node);
+					node->Left->UpdateHeight();
+					size++;
+					GoodPrint(nullptr);
+					cout << "\n\n\n\n\n";
+					
+				}
+				else
+					return Insert(key, value, node->Left);
+			}
+			else {
+				if (node->Right == nullptr) {
+					node->Right = new Node(Pair<type1, type2>(key, value), node);
+					node->Right->UpdateHeight();
+					size++;
+					GoodPrint(nullptr);
+					cout << "\n\n\n\n\n";
+				}
+				else
+					return Insert(key, value, node->Right);
+			}
 		}
 
 		void Delete(const type1& key, Node* node = nullptr) {
@@ -332,40 +472,11 @@ namespace DataContainers {
 			Delete(node->Data.Key, node);
 		}
 
-		void ForEach(const function<void(type2 i)>& function, Node* node = nullptr) {
-			if (!node)
-				node = root;
-
-			if(node->Left != nullptr)
-				ForEach(function, node->Left);
-
-			function(node->Data.Value);
-
-			if(node->Right != nullptr)
-				ForEach(function, node->Right);
-		}
-
-		unsigned int Size() const {
-			return size;
-		}
-
-		bool Contains(const type1& key, Node* node = nullptr) const {
-			if (!node)
-				node = root;
-
-			if(node->Left && Contains(key, node->Left))
-				return true;
-
-			if (node->Right && Contains(key, node->Right))
-				return true;
-
-			return key == node->Data.Key;
-		}
-
 		void PrintFormat(Node* node = nullptr) {
 			if (!node)
 				node = this->root;
 
+			unsigned int spacing = 3;
 			queue<Node*> treeLevel, temp;
 			treeLevel.push(node);
 			int counter = 0;
@@ -407,47 +518,50 @@ namespace DataContainers {
 			}
 		}
 
+
+		void ForEach(const function<void(type2& i)>& function, Node* node = nullptr) {
+			if (!node)
+				node = root;
+
+			if(node->Left != nullptr)
+				ForEach(function, node->Left);
+
+			function(node->Data.Value);
+
+			if(node->Right != nullptr)
+				ForEach(function, node->Right);
+		}
+
+		Vector<Pair<type1, type2>> Filter(const function<bool(Pair<type1, type2>)>& predicate) const {
+			auto result = Vector<Pair<type1, type2>>(size);
+			filter(result, predicate, root);
+			return result;
+		}
+
+		unsigned int Size() const {
+			return size;
+		}
+
 		Vector<type1> Keys() const {
 			auto result = Vector<type1>(size);
-			FindKeys(result, root);
+			forEach(result, root);
 			return result;
 			
 		}
 
-		void FindKeys(Vector<type1>& vector, Node* node = nullptr) const {
+		bool Contains(const type1& key, Node* node = nullptr) const {
 			if (!node)
 				node = root;
 
-			if (node->Left)
-				FindKeys(vector, node->Left);
+			if (node->Left && Contains(key, node->Left))
+				return true;
 
-			vector.PushBack(node->Data.Key);
+			if (node->Right && Contains(key, node->Right))
+				return true;
 
-			if (node->Right)
-				FindKeys(vector, node->Right);
+			return key == node->Data.Key;
 		}
-
-		Vector<Pair<type1, type2>> Filter(const function<bool(Pair<type1, type2>)>& predicate) {
-			auto result = Vector<Pair<type1, type2>>(size);
-			Foo(result, predicate, root);
-			return result;
-		}
-
-		void Foo(Vector<Pair<type1, type2>>& vector,
-				 const function<bool(Pair<type1, type2>)>& predicate,
-				 Node* node = nullptr) {
-			if (!node)
-				node = root;
-
-			if (node->Left)
-				Foo(vector, predicate, node->Left);
-
-			if(predicate(node->Data))
-				vector.PushBack(node->Data);
-
-			if (node->Right)
-				Foo(vector, predicate, node->Right);
-		}
-
 	};
 }
+
+		

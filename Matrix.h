@@ -30,10 +30,6 @@ namespace DataContainers {
 						res = to_string(init[i][j]).size();
 			return res;
 		}
-		Vector<type> inverse()
-		{
-			
-		}
 	public:
 		~Matrix() {
 			for (size_t i = 0; i < rows; i++) {
@@ -351,12 +347,21 @@ namespace DataContainers {
 		}
 
 		// Request user input in console
-		void KbInput(int posX = 0, int posY = 0) {
+		void KbInput(int posX = -1, int posY = -1) {
+			if(posX == -1 || posY == -1) {
+				HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+				CONSOLE_SCREEN_BUFFER_INFO cbsi;
+				GetConsoleScreenBufferInfo(h, &cbsi);
+				posX = cbsi.dwCursorPosition.X;
+				posY = cbsi.dwCursorPosition.Y;
+			}
+			
+
 			for (size_t i = 0; i < rows; i++) {
 				COORD coord;
-				coord.Y = i + 1 + posY;
+				coord.Y = i + posY;
 				for (size_t j = 0; j < columns; j++) {
-					if (j == 0) coord.X = j + 1 + posX;
+					if (j == 0) coord.X = j + posX;
 					bool flag;
 					do {
 						int tmp;
@@ -551,8 +556,8 @@ namespace DataContainers {
 			}
 		}
 
-		Matrix<type> Pow(int degree = 1) {
-			assert(rows == columns & degree );
+		Matrix<type> Pow(int degree = 2) {
+			assert(rows == columns & degree >= 0);
 			Matrix<type> result = *this;
 			for (size_t i = 1; i < degree; i++)
 				result = result * result;
@@ -598,7 +603,7 @@ namespace DataContainers {
 			return result;
 		}
 
-		type Inverse(type** data = nullptr, int row = 0, int col = 0) {
+		/*type Inverse(type** data = nullptr, int row = 0, int col = 0) {
 			if (Determinant() == 0)
 				throw invalid_argument("matrix do not have inverse version");
 
@@ -640,7 +645,7 @@ namespace DataContainers {
 			}
 			return result;
 
-		}
+		}*/
 
 		Vector<type> GetVector() {
 
@@ -657,8 +662,9 @@ namespace DataContainers {
 			
 		}
 
-	    Matrix<type> test() {
-	        assert(rows == columns && rows > 0);
+		//Gauss-Jordan method
+	    Matrix<type> Inverse() {
+	        assert(rows == columns);
 
 	        Matrix<type> augmented(rows, columns * 2);
 
@@ -668,9 +674,8 @@ namespace DataContainers {
 	                augmented.data[i][j + columns] = (i == j) ? 1 : 0;
 	            }
 
-
 	        for (int i = 0; i < rows; ++i) {
-	            // Если текущий элемент на диагонали равен нулю, меняем строки для избежания деления на ноль
+	         
 	            if (augmented.data[i][i] == 0) {
 	                int nonZeroRow = -1;
 
@@ -686,25 +691,29 @@ namespace DataContainers {
 	                    std::swap(augmented.data[i][j], augmented.data[nonZeroRow][j]);
 	            }
 
-	            // Делаем текущий элемент на диагонали равным 1
+				augmented.Print();
+				cout << "\n\n";
+
+	          
 	            type divisor = augmented.data[i][i];
 	            for (int j = 0; j < columns * 2; ++j)
 	                augmented.data[i][j] /= divisor;
 
 	            // Обнуляем все элементы в столбце, кроме текущего
+				augmented.Print();
+				cout << "\n\n";
 	            for (int k = 0; k < rows; ++k)
 	                if (k != i) {
 	                    type factor = augmented.data[k][i];
 	                    for (int j = 0; j < columns * 2; ++j)
 	                        augmented.data[k][j] -= factor * augmented.data[i][j];
 	                }
-	            
+				augmented.Print();
+				cout << "\n\n\n\n\n";
 	        }
 
 
 
-
-	        // Создаем новую матрицу для результата (просто правая половина расширенной матрицы)
 	        Matrix<type> result(rows, columns);
 	        for (int i = 0; i < rows; ++i)
 	            for (int j = 0; j < columns; ++j)

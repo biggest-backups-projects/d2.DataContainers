@@ -23,7 +23,7 @@ namespace DataContainers {
 		}
 	};
 
-	template<typename type1, typename type2>
+	template<typename keyType, typename valueType>
 	class Dictionary {
 	private:
 		class Node {
@@ -32,7 +32,7 @@ namespace DataContainers {
 			Node* Right;
 			Node* Parent;
 			unsigned int Height;
-			Pair<type1, type2> Data;
+			Pair<keyType, valueType> Data;
 
 			Node() {
 				Left = nullptr;
@@ -41,7 +41,7 @@ namespace DataContainers {
 				Height = 0;
 			}
 
-			Node(Pair<type1, type2> data, Node* parent = nullptr) : Node() {
+			Node(Pair<keyType, valueType> data, Node* parent = nullptr) : Node() {
 				Data = data;
 				Parent = parent;
 			}
@@ -195,7 +195,7 @@ namespace DataContainers {
 		}
 
 		// DO NOT WORK!
-		void GoodPrint(function<string(Pair<type1, type2>)> func, uint32_t sp = 2) {
+		void GoodPrint(function<string(Pair<keyType, valueType>)> func, uint32_t sp = 2) {
 			const uint32_t spacing = sp;
 			uint32_t width = pow(2, root->Height) * spacing;
 
@@ -211,8 +211,12 @@ namespace DataContainers {
 
 					if (elem == nullptr)
 						debug("null");
+#ifdef DEBUG
 					else
 						DEBUG(format("{}", elem->Data.Key));
+#endif
+
+				
 				}
 				cout << "\n\n\n";
 			}
@@ -299,8 +303,8 @@ namespace DataContainers {
 				vector.PushBack(nullptr);
 		}
 
-		void filter(Vector<Pair<type1, type2>>& vector,
-			const function<bool(Pair<type1, type2>)>& predicate,
+		void filter(Vector<Pair<keyType, valueType>>& vector,
+			const function<bool(Pair<keyType, valueType>)>& predicate,
 			Node* node = nullptr) {
 			if (!node)
 				node = root;
@@ -315,7 +319,7 @@ namespace DataContainers {
 				filter(vector, predicate, node->Right);
 		}
 
-		void forEach(Vector<type1>& vector, Node* node = nullptr) const {
+		void forEach(Vector<keyType>& vector, Node* node = nullptr) const {
 			if (!node)
 				node = root;
 
@@ -336,13 +340,16 @@ namespace DataContainers {
 			Clear();
 		}
 
-		void Insert(type1 key, type2 value, Node* node = nullptr) {
+		void Insert(keyType key, valueType value, Node* node = nullptr) {
 			if(!root) {
-				Node* newNode = new Node(Pair<type1, type2>(key, value));
+				Node* newNode = new Node(Pair<keyType, valueType>(key, value));
 				root = newNode;
 				size++;
+#ifdef DEBUG
 				GoodPrint(nullptr);
 				cout << "\n\n\n\n\n";
+#endif
+
 				return;
 			}
 
@@ -351,30 +358,34 @@ namespace DataContainers {
 
 			if(key < node->Data.Key) {
 				if (node->Left == nullptr) {
-					node->Left = new Node(Pair<type1, type2>(key, value), node);
+					node->Left = new Node(Pair<keyType, valueType>(key, value), node);
 					node->Left->UpdateHeight();
 					size++;
+#ifdef DEBUG
 					GoodPrint(nullptr);
 					cout << "\n\n\n\n\n";
-					
+#endif
 				}
 				else
 					return Insert(key, value, node->Left);
 			}
 			else {
 				if (node->Right == nullptr) {
-					node->Right = new Node(Pair<type1, type2>(key, value), node);
+					node->Right = new Node(Pair<keyType, valueType>(key, value), node);
 					node->Right->UpdateHeight();
 					size++;
+#ifdef DEBUG
 					GoodPrint(nullptr);
 					cout << "\n\n\n\n\n";
+#endif
+
 				}
 				else
 					return Insert(key, value, node->Right);
 			}
 		}
 
-		void Delete(const type1& key, Node* node = nullptr) {
+		void Delete(const keyType& key, Node* node = nullptr) {
 			if (!node)
 				node = root;
 
@@ -516,7 +527,7 @@ namespace DataContainers {
 			}
 		}
 
-		void ForEach(const function<void(type2& i)>& function, Node* node = nullptr) {
+		void ForEach(const function<void(valueType& i)>& function, Node* node = nullptr) {
 			if (!node)
 				node = root;
 
@@ -529,8 +540,8 @@ namespace DataContainers {
 				ForEach(function, node->Right);
 		}
 
-		Vector<Pair<type1, type2>> Filter(const function<bool(Pair<type1, type2>)>& predicate) const {
-			auto result = Vector<Pair<type1, type2>>(size);
+		Vector<Pair<keyType, valueType>> Filter(const function<bool(Pair<keyType, valueType>)>& predicate) const {
+			auto result = Vector<Pair<keyType, valueType>>(size);
 			filter(result, predicate, root);
 			return result;
 		}
@@ -539,14 +550,14 @@ namespace DataContainers {
 			return size;
 		}
 
-		Vector<type1> Keys() const {
-			auto result = Vector<type1>(size);
+		Vector<keyType> Keys() const {
+			auto result = Vector<keyType>(size);
 			forEach(result, root);
 			return result;
 			
 		}
 
-		bool Contains(const type1& key, Node* node = nullptr) const {
+		bool Contains(const keyType& key, Node* node = nullptr) const {
 			if (!node)
 				node = root;
 
@@ -557,6 +568,26 @@ namespace DataContainers {
 				return true;
 
 			return key == node->Data.Key;
+		}
+
+		valueType& At(const keyType& key, Node* node = nullptr) {
+			if (node == nullptr)
+				node = root;
+			if (key == node->Data.Key)
+				return node->Data.Value;
+	
+			if (key < node->Data.Key)
+				return At(key, node->Left);
+			else if (node->Right)
+				return At(key, node->Right);
+			else
+				throw invalid_argument("invalid key");
+		
+
+		}
+
+		valueType& operator[](keyType key) {
+			return At(key);
 		}
 	};
 }

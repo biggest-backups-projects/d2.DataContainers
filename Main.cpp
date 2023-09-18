@@ -4,7 +4,7 @@
 #include "List.h"
 #include "String.h"	
 #include "Vector.h"
-#define DEBUG
+//#define DEBUG
 #include "Dictionary.h"
 using namespace std;
 using namespace DataContainers;
@@ -56,15 +56,30 @@ int main() {
 
 	//N3
 
-	auto data1 = new double[9] {0, 3, 2,
-		                     1, 2, -3,
-							 3, 4, 1 };
+	//auto data1 = new float[9] { 0, 3, 2,
+	//							 0, 2, -3,
+	//							 3, 4, 1 };
 
-	Matrix<double> m(data1, 3, 3);
+	//Matrix<float> m(data1, 3, 3);
+	//m.Print();
+	//cout << "\n\n\n";
+	//m.Inverse().Print();
 
-	m.test().Print();
 
+	
+	//Matrix<int> m(3, 3);
+	//Matrix<int> m1(3, 3);
 
+	//m.KbInput();
+	//m.KbInput();
+
+	Dictionary<int, int> d;
+
+	for (size_t i = 0; i < 20; i++) {
+		d.Insert(i, i);
+	}
+
+	cout << d.At(19);
 
 
 }

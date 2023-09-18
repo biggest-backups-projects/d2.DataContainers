@@ -6,18 +6,18 @@
 #include <math.h>
 
 namespace DataContainers {
-	template<typename type1, typename type2, typename = std::enable_if_t<std::is_arithmetic_v<type1>>>
+	template<typename keyType, typename valueType, typename = std::enable_if_t<std::is_arithmetic_v<keyType>>>
 	class Pair
 	{
 	public:
-		type1 Key;
-		type2 Value;
+		keyType Key;
+		valueType Value;
 
 		Pair() {
 			
 		}
 
-		Pair(type1 key, type2 value) {
+		Pair(keyType key, valueType value) {
 			this->Key = key;	
 			this->Value = value;
 		}
@@ -190,7 +190,7 @@ namespace DataContainers {
 			return GetMax(node->Right);
 		}
 
-		void DEBUG(string str) {
+		void debug(string str) {
 			cout << "DEBUG: " << str << endl;
 		}
 
@@ -210,7 +210,7 @@ namespace DataContainers {
 						contentSize += std::format("{}", elem->Data.Key).size();
 
 					if (elem == nullptr)
-						DEBUG("null");
+						debug("null");
 					else
 						DEBUG(format("{}", elem->Data.Key));
 				}
@@ -259,7 +259,6 @@ namespace DataContainers {
 
 					/*if(i % 2 == 0 && i != 0)
 						cout << "\t";*/
-
 				}
 
 				num++;
@@ -336,7 +335,6 @@ namespace DataContainers {
 		~Dictionary() {
 			Clear();
 		}
-
 
 		void Insert(type1 key, type2 value, Node* node = nullptr) {
 			if(!root) {
@@ -517,7 +515,6 @@ namespace DataContainers {
 				}
 			}
 		}
-
 
 		void ForEach(const function<void(type2& i)>& function, Node* node = nullptr) {
 			if (!node)

@@ -9,22 +9,38 @@ namespace DataContainers {
 		return res;
 	}
 
-	void StringBuilder::Print() {
-		std::cout << "\n ----- \n String Builder info : \n Capacity: "
-			<< capacity
-			<< " \n lastString: "
-			<< lastString << "\n";
 
-		for (int i = 0; i < lastString; i++)
-			std::cout << i << " => " << data[i] << "\n";
-	}
 
 	void StringBuilder::zeroArr(char**& arrToNull, unsigned int count) {
 		for (int i = 0; i < count; i++)
 			arrToNull[i] = nullptr;
 	}
 
-	void StringBuilder::KillData() {
+
+	void StringBuilder::Clear() {
+		for (int i = 0; i < lastString; i++) {
+			delete[] data[i];
+			data[i] = nullptr;
+		}
+		delete[] data;
+
+		this->capacity = 8;
+		data = new char* [this->capacity];
+		lastString = 0;
+		//zeroArr(data, this->capacity);
+	}
+
+	StringBuilder::StringBuilder(unsigned int capacity = 8) {
+		assert(capacity > 8);
+		this->capacity = capacity;
+		data = new char* [this->capacity];
+		lastString = 0;
+		size = 0;
+	/*	zeroArr(data, this->capacity);*/
+	}
+
+
+	StringBuilder::~StringBuilder() {
 		for (int i = 0; i < lastString; i++) {
 			delete[] data[i];
 			data[i] = nullptr;
@@ -34,30 +50,8 @@ namespace DataContainers {
 		delete[] data;
 	}
 
-	void StringBuilder::Clear() {
-		KillData();
-		this->capacity = 8;
-		data = new char* [this->capacity];
-		lastString = 0;
-		StringBuilder::zeroArr(data, this->capacity);
-	}
-
-	StringBuilder::StringBuilder(unsigned int capacity = 8) {
-		assert(capacity > 8);
-		this->capacity = capacity;
-		data = new char* [this->capacity];
-		lastString = 0;
-		size = 0;
-		StringBuilder::zeroArr(data, this->capacity);
-	}
-
-
-	StringBuilder::~StringBuilder() {
-		KillData();
-	}
-
 	void StringBuilder::Append(const char* string, bool endl) {
-		int size = StringBuilder::calcLen(string);
+		int size = calcLen(string);
 		if (endl) size++;
 
 		if (lastString == capacity)
@@ -69,7 +63,7 @@ namespace DataContainers {
 
 		if (endl) data[lastString][size - 2] = '\n';
 		data[lastString][size - 1] = '\0';
-		size += size - 1;
+		size -= 1;
 		lastString++;
 	}
 
@@ -107,7 +101,7 @@ namespace DataContainers {
 			newCapacity = 2 * capacity;
 
 		char** newData = new char* [newCapacity];
-		StringBuilder::zeroArr(newData, newCapacity);
+		zeroArr(newData, newCapacity);
 
 		for (int i = 0; i < lastString; i++)
 			newData[i] = data[i];
@@ -117,7 +111,7 @@ namespace DataContainers {
 		capacity = newCapacity;
 	}
 
-	DataContainers::String StringBuilder::ToString() const {
+	String StringBuilder::ToString() const {
 		char* result = new char[size + 1];
 		unsigned int currentPosition = 0;
 		for (unsigned int s = 0; s < lastString; s++) {
@@ -126,7 +120,7 @@ namespace DataContainers {
 				result[currentPosition++] = data[s][i++];
 		}
 		result[size] = '\0';
-		DataContainers::String res(result);
+		String res(result);
 
 		return res;
 	}

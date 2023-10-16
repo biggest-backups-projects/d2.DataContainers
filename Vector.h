@@ -27,25 +27,48 @@ namespace DataContainers {
 			data = newData;
 		}
 	public:
-
 		Vector(unsigned int capacity = 8) :
 			capacity(capacity),	size(0) {
 			data = new type[capacity];
 		}	
-		Vector(const Vector<type>& list) {
+		Vector(const Vector<type>& list) : Vector(list.Size()) {
 			for (unsigned int i = 0; i < list.Size(); i++)
 				PushBack(list[i]);
 		}
-		Vector(const std::initializer_list<type> _arr) : Vector() {
+		Vector(const std::initializer_list<type> _arr) : Vector(_arr.size()) {
 			for (const auto& elem : _arr)
 				PushBack(elem);
 		}
-
 		~Vector() {
 			Clear();
 		}
 
-		void PushBack(const type& elem) {
+
+		void Append(const std::initializer_list<type> _arr) {
+			for (const auto& elem : _arr)
+				PushBack(elem);
+		}
+		void Append(const type data) {
+			PushBack(data);
+		}
+		type Min() {
+			type res = data[0];
+			for (size_t i = 1; i < size; i++) {
+				if (data[i] < res)
+					res = data[i];
+			}
+			return res;
+		}
+		type Max() {
+			type res = data[0];
+			for (size_t i = 1; i < size; i++) {
+				if (data[i] > res)
+					res = data[i];
+			}
+			return res;
+		}
+
+		void PushBack(const type elem) {
 			if (size == capacity)
 				setCapacity();
 
@@ -76,6 +99,7 @@ namespace DataContainers {
 			data = newData;
 			size++;
 		}
+
 		void Insert(const type& elem, unsigned ind) {
 
 			if (ind == 0)
@@ -101,8 +125,6 @@ namespace DataContainers {
 
 			size++;
 		}
-
-
 		void ForEach(const std::function<void(type)>& function)	{
 			for (size_t i = 0; i < size; i++)
 				function(data[i]);
@@ -115,7 +137,6 @@ namespace DataContainers {
 			}
 			return result;
 		}
-
 
 		[[nodiscard]]
 		type PopBack() {
@@ -162,12 +183,11 @@ namespace DataContainers {
 			return result;
 		}
 		[[nodiscard]]
-		type At(unsigned int ind) const {
-			assert(ind < size && "Index out of range");
+		type& At(unsigned int ind) const {
+			assert(ind < capacity && "Index out of range");
 			return data[ind];
 		}
-		[[nodiscard]]
-		type operator[](unsigned ind) const {
+		type& operator[](unsigned ind) const {
 			return At(ind);
 		}
 		void Remove(unsigned ind) {
@@ -188,7 +208,7 @@ namespace DataContainers {
 			size--;
 		}
 
-
+		// Methods for iteration
 		type* begin() const {
 			return data;
 		}

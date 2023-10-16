@@ -3,8 +3,9 @@
 #include <iostream>
 #include <queue>
 #include <format>
-#include <math.h>
-
+#include "Vector.h"
+#include <functional>
+using namespace std;
 namespace DataContainers {
 	template<typename keyType, typename valueType, typename = std::enable_if_t<std::is_arithmetic_v<keyType>>>
 	class Pair
@@ -12,10 +13,6 @@ namespace DataContainers {
 	public:
 		keyType Key;
 		valueType Value;
-
-		Pair() {
-			
-		}
 
 		Pair(keyType key, valueType value) {
 			this->Key = key;	
@@ -31,7 +28,7 @@ namespace DataContainers {
 			Node* Left;
 			Node* Right;
 			Node* Parent;
-			unsigned int Height;
+			uint32_t Height;
 			Pair<keyType, valueType> Data;
 
 			Node() {
@@ -158,22 +155,8 @@ namespace DataContainers {
 		};
 
 		Node* root;
-		unsigned int size;
+		uint32_t size;
 	
-
-		void printSpace(double n, Node* node) {
-
-			while(n>0) {
-				cout << "\t";
-				n--;
-			}
-
-			if (!node)
-				cout << " ";
-			else
-				cout << node->Data.Key << ": " << node->Height;
-		}
-
 		Node* GetMin(Node* node = nullptr) {
 			if (!node)
 				node = root;
@@ -190,122 +173,9 @@ namespace DataContainers {
 			return GetMax(node->Right);
 		}
 
-		void debug(string str) {
-			cout << "DEBUG: " << str << endl;
-		}
-
-		// DO NOT WORK!
-		void GoodPrint(function<string(Pair<keyType, valueType>)> func, uint32_t sp = 2) {
-			const uint32_t spacing = sp;
-			uint32_t width = pow(2, root->Height) * spacing;
-
-
-			const auto& lastLayer = GetLayer(0);
-			int contentSize = 0;
-
-			if (size > 1) {
-				for (Node* elem : lastLayer) {
-
-					if (elem)
-						contentSize += std::format("{}", elem->Data.Key).size();
-
-					if (elem == nullptr)
-						debug("null");
-#ifdef DEBUG
-					else
-						DEBUG(format("{}", elem->Data.Key));
-#endif
-
-				
-				}
-				cout << "\n\n\n";
-			}
-
-
-			const uint32_t rootOffset = ceil(format("{}", root->Data.Key).size() / 2);
-			const uint32_t maxWith = width + contentSize;
-			const uint32_t rootSpacing = maxWith / 2 - rootOffset;
-
-
-
-			// Print root key
-			for (uint32_t i = 0; i < rootSpacing; i++)
-				cout << "\t";
-			cout << root->Data.Key;
-
-
-			int current = root->Height - 1;
-			uint32_t num = 1;
-			// Print body
-			while (current >= 0) {
-				cout << "\n\n";
-
-				//const uint32_t layerSpacing = pow(2, current == 0 ? 1 : current);
-
-				const auto& elements = GetLayer(current);
-				unsigned int maxHeight = 0;
-				for (const auto& elem : elements)
-					if (elem && elem->Parent->Height > maxHeight)
-						maxHeight = elem->Parent->Height;
-
-				const uint32_t layerSpacing = pow(2, maxHeight);
-				for (size_t i = 0; i < abs(int(rootSpacing - num)); i++)
-					cout << "\t";
-
-				for (uint32_t i = 0; i < elements.Size(); i++) {
-					if (elements[i])
-						cout << elements[i]->Data.Key;
-					else
-						cout << " ";
-
-					for (size_t j = 0; j < layerSpacing; j++)
-						cout << "\t";
-
-					/*if(i % 2 == 0 && i != 0)
-						cout << "\t";*/
-				}
-
-				num++;
-				current--;
-			}
-
-			int i = 0;
-
-		}
-
-		Vector<Node*> GetLayer(int layer) {
-			auto result = Vector<Node*>(size);
-			NodesLayer(layer, result, root, root->Height);
-			return result;
-		}
-
-		void NodesLayer(int layer, Vector<Node*>& vector, Node* node = nullptr, int pos = 0) {
-
-			if (node == nullptr) {
-				node = root;
-				pos = node->Height;
-			}
-
-			if (pos == layer) {
-				vector.PushBack(node);
-				return;
-			}
-
-			pos -= 1;
-			if (node->Left)
-				NodesLayer(layer, vector, node->Left, pos);
-			else if (pos == layer)
-				vector.PushBack(nullptr);
-
-			if (node->Right)
-				NodesLayer(layer, vector, node->Right, pos);
-			else if (pos == layer)
-				vector.PushBack(nullptr);
-		}
-
 		void filter(Vector<Pair<keyType, valueType>>& vector,
-			const function<bool(Pair<keyType, valueType>)>& predicate,
-			Node* node = nullptr) {
+					const function<bool(Pair<keyType, valueType>)>& predicate,
+					Node* node = nullptr) {
 			if (!node)
 				node = root;
 
@@ -345,11 +215,6 @@ namespace DataContainers {
 				Node* newNode = new Node(Pair<keyType, valueType>(key, value));
 				root = newNode;
 				size++;
-#ifdef DEBUG
-				GoodPrint(nullptr);
-				cout << "\n\n\n\n\n";
-#endif
-
 				return;
 			}
 
@@ -361,10 +226,6 @@ namespace DataContainers {
 					node->Left = new Node(Pair<keyType, valueType>(key, value), node);
 					node->Left->UpdateHeight();
 					size++;
-#ifdef DEBUG
-					GoodPrint(nullptr);
-					cout << "\n\n\n\n\n";
-#endif
 				}
 				else
 					return Insert(key, value, node->Left);
@@ -374,10 +235,7 @@ namespace DataContainers {
 					node->Right = new Node(Pair<keyType, valueType>(key, value), node);
 					node->Right->UpdateHeight();
 					size++;
-#ifdef DEBUG
-					GoodPrint(nullptr);
-					cout << "\n\n\n\n\n";
-#endif
+
 
 				}
 				else
@@ -481,12 +339,12 @@ namespace DataContainers {
 			Delete(node->Data.Key, node);
 		}
 
-		void PrintFormat(Node* node = nullptr) {
+		void PrintFormat(const Node* node = nullptr) {
 			if (!node)
 				node = this->root;
 
-			unsigned int spacing = 3;
-			queue<Node*> treeLevel, temp;
+			uint32_t spacing = 3;
+			std::queue<Node*> treeLevel, temp;
 			treeLevel.push(node);
 			int counter = 0;
 			int height = node->Height+1;
@@ -517,7 +375,7 @@ namespace DataContainers {
 				}
 
 				if (treeLevel.empty()) {
-					cout << endl << endl;
+					std::cout << std::endl << std::endl;
 					treeLevel = temp;
 					while (!temp.empty())
 						temp.pop();
@@ -527,7 +385,7 @@ namespace DataContainers {
 			}
 		}
 
-		void ForEach(const function<void(valueType& i)>& function, Node* node = nullptr) {
+		void ForEach(const std::function<void(valueType& i)>& function, Node* node = nullptr) {
 			if (!node)
 				node = root;
 
@@ -540,13 +398,13 @@ namespace DataContainers {
 				ForEach(function, node->Right);
 		}
 
-		Vector<Pair<keyType, valueType>> Filter(const function<bool(Pair<keyType, valueType>)>& predicate) const {
+		Vector<Pair<keyType, valueType>> Filter(const std::function<bool(Pair<keyType, valueType>)>& predicate) const {
 			auto result = Vector<Pair<keyType, valueType>>(size);
 			filter(result, predicate, root);
 			return result;
 		}
 
-		unsigned int Size() const {
+		uint32_t len() const {
 			return size;
 		}
 
@@ -578,10 +436,9 @@ namespace DataContainers {
 	
 			if (key < node->Data.Key)
 				return At(key, node->Left);
-			else if (node->Right)
+			if (node->Right)
 				return At(key, node->Right);
-			else
-				throw invalid_argument("invalid key");
+			throw std::invalid_argument("invalid key");
 		
 
 		}

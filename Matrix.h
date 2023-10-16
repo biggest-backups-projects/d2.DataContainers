@@ -12,8 +12,7 @@ using namespace std;
 
 namespace DataContainers {
 	template <typename type, typename = enable_if_t<is_arithmetic_v<type>>>
-	class Matrix
-	{
+	class Matrix {
 	private:
 		unsigned int rows;
 		unsigned int columns;
@@ -21,9 +20,8 @@ namespace DataContainers {
 		int currCol;
 		type** data;
 
-		int MaxSize(type** init, int row, int col) {
+		static int MaxSize(type** init, int row, int col) {
 			int res = 0;
-
 			for (size_t i = 0; i < row; i++)
 				for (size_t j = 0; j < col; j++)
 					if (to_string(init[i][j]).size() > res)
@@ -39,7 +37,6 @@ namespace DataContainers {
 			delete data;
 			data = nullptr;
 		}
-
 		Matrix(unsigned int row, unsigned int col) {
 			data = new type * [row];
 			for (size_t i = 0; i < row; i++)
@@ -50,30 +47,33 @@ namespace DataContainers {
 			this->currRow = 0;
 			this->currCol = -1;
 		}
-
 		Matrix(const Matrix<type>& elem) : Matrix(elem.rows, elem.columns) {
 			assert(elem.Height() == rows && elem.Width() == columns);
 			for (size_t i = 0; i < rows; i++)
 				for (size_t j = 0; j < columns; j++)
 					data[i][j] = elem.data[i][j];
 		}
+		Matrix(type** data, unsigned int row, unsigned int col) {
+			this->data = new type * [row];
+			for (size_t i = 0; i < row; i++)
+				this->data[i] = new type[col];
 
-		Matrix(type** data, int row, int col) {
-			this->data = data;
+			for (size_t i = 0; i < row; i++)
+				for (size_t j = 0; j < col; j++)
+					this->data[i][j] = data[i][j];
+
 			this->rows = row;
 			this->columns = col;
 			this->currCol = row-1;
 			this->currRow = col - 1;
 		}
-
 		Matrix(type* data, unsigned int row, unsigned int col) : Matrix(row, col) {
 			int tmp = 0;
-			for (size_t i = 0; i < col; i++)
-				for (size_t j = 0; j < row; j++)
-				{
+			for (size_t i = 0; i < row; i++)
+				for (size_t j = 0; j < col; j++) {
 					this->data[i][j] = data[tmp++];
-					currCol = i;
-					currRow = j;
+					currCol = j;
+					currRow = i;
 				}
 		}
 
@@ -92,13 +92,11 @@ namespace DataContainers {
 					throw "Matrix if full";
 			}
 		}
-
 		static void Initialize(type**& init, int row, int col) {
 			init = new type * [row];
 			for (size_t i = 0; i < row; i++)
 				init[i] = new type[col];
 		}
-
 		static void Delete(type**& init, int row) {
 			for (size_t i = 0; i < row; i++) {
 				delete[] init[i];
@@ -106,7 +104,6 @@ namespace DataContainers {
 			}
 			init = nullptr;
 		}
-
 		type* GetColumn(int col) {
 			type* result = new type[columns];
 			for (size_t i = 0; i < rows; i++)
@@ -164,8 +161,7 @@ namespace DataContainers {
 			return in;
 
 		}
-
-		friend Matrix operator+(Matrix<type>& first, Matrix<type>& second) {
+		friend Matrix operator+(const Matrix<type>& first, const Matrix<type>& second) {
 			assert(first.columns == second.rows);
 
 			Matrix<type> tmp(first.rows, second.columns);
@@ -184,7 +180,7 @@ namespace DataContainers {
 			return tmp;
 
 		}
-		friend Matrix operator-(Matrix<type>& first, Matrix<type>& second) {
+		friend Matrix operator-(const Matrix<type>& first, const Matrix<type>& second) {
 			assert((first.columns == second.columns && first.rows == second.rows) && "Matrix sizes do not match");
 
 
@@ -205,7 +201,7 @@ namespace DataContainers {
 					
 			return tmp;
 		}
-		friend Matrix operator*(Matrix<type>& first, Matrix<type>& second) {
+		friend Matrix operator*(const Matrix<type>& first, const Matrix<type>& second) {
 			assert(first.columns == second.rows);
 
 			Matrix<type> tmp(first.rows, second.columns);
@@ -221,7 +217,7 @@ namespace DataContainers {
 
 			return tmp;
 		}
-		friend Matrix operator*(type num, Matrix<type>& second) {
+		friend Matrix operator*(const type num, const Matrix<type>& second) {
 			Matrix<type> tmp(second.rows, second.columns);
 
 			for (size_t i = 0; i < tmp.rows; i++) {
@@ -243,7 +239,7 @@ namespace DataContainers {
 			}
 			return tmp;
 		}
-		friend Matrix operator/(Matrix<type>&first, Matrix<type>&second) {
+		friend Matrix operator/(const Matrix<type>&first,const Matrix<type>&second) {
 			assert((first.columns == second.rows) && "Matrix sizes do not match");
 
 			Matrix<type> tmp(first.rows, second.columns);
@@ -260,7 +256,7 @@ namespace DataContainers {
 			return tmp;
 
 		}
-		Matrix& operator=(Matrix<type> second)
+		Matrix& operator=(const Matrix<type>& second)
 		{
 			if (data != nullptr)
 				Clear();
@@ -278,7 +274,6 @@ namespace DataContainers {
 			}
 			return *this;
 		}
-
 		friend bool operator==(Matrix<type>&first, Matrix<type>&second)	{
 			if (first.rows != second.rows || first.columns != second.columns) return false;
 
@@ -313,8 +308,7 @@ namespace DataContainers {
 			rows = 0;
 			columns = 0;
 		}
-
-		void RandomFill(type min = 0, type max = 10) {
+		void RandomFill(const type min = 0, const type max = 10) {
 			for (size_t i = 0; i < rows; i++) {
 				for (size_t j = 0; j < columns; j++) {
 					if constexpr (is_integral_v<type>) data[i][j] = rand() % (max - min + 1) + min;
@@ -322,7 +316,6 @@ namespace DataContainers {
 				}
 			}
 		}
-
 		void Print(unsigned int space = 2, unsigned int height = 0) {
 			for (size_t i = 0; i < rows; i++) {
 				for (size_t j = 0; j < columns; j++)
@@ -334,7 +327,6 @@ namespace DataContainers {
 			
 			}
 		}
-
 		Matrix<type> Transposition() {
 			type** newData;
 			Initialize(newData, columns, rows);
@@ -345,7 +337,6 @@ namespace DataContainers {
 			}
 			return Matrix<type>(newData, columns, rows);
 		}
-
 		// Request user input in console
 		void KbInput(int posX = -1, int posY = -1) {
 			if(posX == -1 || posY == -1) {
@@ -386,11 +377,8 @@ namespace DataContainers {
 				}
 			}
 		}
-
 		unsigned int Height() const { return rows; }
-
 		unsigned int Width() const { return columns; }
-
 		void DeleteRow(int pos = -1) {
 			assert(pos >= -1 && pos <= rows - 1);
 			if (pos == -1) pos = rows - 1;
@@ -415,7 +403,6 @@ namespace DataContainers {
 			data = NewData;
 			rows--;
 		}
-
 		void DeleteColumn(int pos =-1) {
 			if (pos == -1) pos = columns - 1;
 			assert(pos >= 0 && pos <= columns - 1);
@@ -440,7 +427,6 @@ namespace DataContainers {
 			columns--;
 	
 		}
-
 		void AddRow(type* elem, int pos = -1) {
 			assert(pos >= -1 || pos < rows);
 			if (pos == -1) pos = rows;
@@ -465,7 +451,6 @@ namespace DataContainers {
 			data = NewData;
 			rows++;
 		}
-
 		void AddCol(type*& elem, int pos = -1) {
 			assert(pos > 0 || pos < columns);
 
@@ -493,7 +478,6 @@ namespace DataContainers {
 			columns++;
 
 		}
-
 		type Max() {
 			type res = data[0][0];
 			for (size_t i = 0; i < rows; i++)
@@ -502,7 +486,6 @@ namespace DataContainers {
 						res = data[i][j];
 			return res;
 		}
-
 		type Min() {
 			type res = data[0][0];
 			for (size_t i = 0; i < rows; i++) {
@@ -513,7 +496,6 @@ namespace DataContainers {
 			}
 			return res;
 		}
-
 		void SortLineByLine() {
 			for (size_t i = 0; i < rows; i++) {
 				for (size_t j = 0; j < columns - 1; j++) {
@@ -526,7 +508,6 @@ namespace DataContainers {
 				}
 			}
 		}
-
 		void Sort() {
 			for (size_t i_swap = 0; i_swap < rows; i_swap++) {
 				for (size_t j_swap = 0; j_swap < columns; j_swap++) {
@@ -555,7 +536,6 @@ namespace DataContainers {
 
 			}
 		}
-
 		Matrix<type> Pow(int degree = 2) {
 			assert(rows == columns & degree >= 0);
 			Matrix<type> result = *this;
@@ -564,7 +544,6 @@ namespace DataContainers {
 			return result;
 			
 		}
-
 		type Determinant(type** data = nullptr, int row = 0, int col = 0) {
 			assert(row == col && row >= 0 && col >= 0);
 			if(!data) {
@@ -576,12 +555,16 @@ namespace DataContainers {
 			if (row == 2 && col == 2)
 				return (data[0][0] * data[1][1]) - (data[0][1] * data[1][0]);
 
+			
+
 			type** newData = nullptr;
 			Matrix<type>::Initialize(newData, row - 1, col - 1);
 
 			type result = 0;
 			for (size_t i = 0; i < col; i++) {
+				
 				int r = 0, c = 0;
+				// create sub matrix
 				for (size_t k = 1; k < row; ++k)
 					for (size_t j = 0; j < col; ++j) {
 						if(j !=  i) {
@@ -595,58 +578,9 @@ namespace DataContainers {
 								
 						}
 					}
-
-				result += pow(-1, i + 2) *
-					      data[0][i] * Determinant(newData, row - 1, col - 1);
-
 			}
 			return result;
 		}
-
-		/*type Inverse(type** data = nullptr, int row = 0, int col = 0) {
-			if (Determinant() == 0)
-				throw invalid_argument("matrix do not have inverse version");
-
-
-			assert(row == col && row >= 0 && col >= 0);
-			if (!data) {
-				data = this->data;
-				row = rows;
-				col = columns;
-			}
-
-			if (row == 2 && col == 2)
-				return (data[0][0] * data[1][1]) - (data[0][1] * data[1][0]);
-
-			type** newData = nullptr;
-			Matrix<type>::Initialize(newData, row - 1, col - 1);
-
-			Matrix<type> result;
-			for (size_t i = 0; i < col; i++) {
-				int r = 0, c = 0;
-				for (size_t k = 1; k < row; ++k)
-					for (size_t j = 0; j < col; ++j) {
-						if (j != i) {
-							newData[r][c] = data[k][j];
-
-							c += 1;
-							if (c == col - 1) {
-								c = 0;
-								r += 1;
-							}
-
-						}
-					}
-
-
-				result.PushBack(pow(-1, i + 2) *
-								Inverse(newData, row - 1, col - 1));
-
-			}
-			return result;
-
-		}*/
-
 		Vector<type> GetVector() {
 
 			Vector<type> result(rows * columns);
@@ -661,8 +595,7 @@ namespace DataContainers {
 			return result;
 			
 		}
-
-		//Gauss-Jordan method
+		//Gauss-Jordan method for calculate invesrse matrix
 	    Matrix<type> Inverse() {
 	        assert(rows == columns);
 
@@ -694,22 +627,18 @@ namespace DataContainers {
 				augmented.Print();
 				cout << "\n\n";
 
-	          
 	            type divisor = augmented.data[i][i];
 	            for (int j = 0; j < columns * 2; ++j)
 	                augmented.data[i][j] /= divisor;
 
 	            // Обнуляем все элементы в столбце, кроме текущего
-				augmented.Print();
-				cout << "\n\n";
 	            for (int k = 0; k < rows; ++k)
 	                if (k != i) {
 	                    type factor = augmented.data[k][i];
 	                    for (int j = 0; j < columns * 2; ++j)
 	                        augmented.data[k][j] -= factor * augmented.data[i][j];
 	                }
-				augmented.Print();
-				cout << "\n\n\n\n\n";
+				
 	        }
 
 
@@ -721,7 +650,5 @@ namespace DataContainers {
 
 	        return result;
 	    }
-
-
 	};
 };

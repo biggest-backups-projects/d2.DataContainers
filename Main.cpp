@@ -6,14 +6,21 @@ using namespace std;
 using namespace DataContainers;
 
 int main() {
-	srand(time(0));
-	StringBuilder sb;
-	sb.Append("Hello", true);
-	sb.Append(" World!");
-	sb.AppendLine();
+	//srand(time(0));
+	//StringBuilder sb;
+	//sb.Append("Hello", true);
+	//sb.Append(" World!");
+	//sb.AppendLine();
 
-	String str1("GILY");
-	String str2("GEELY");
-	cout << str1.Similarity(str2) << "%";
+	//String str1("GILY");
+	//String str2("GEELY");
+	//cout << str1.Similarity(str2) << "%";
+
+	String str1("Hello, World!");
+	String str2("Hello, World!");
+
+
+	cout << str1 + "test";
+
 
 }

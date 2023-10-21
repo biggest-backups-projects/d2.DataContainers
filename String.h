@@ -3,10 +3,11 @@
 #include<iostream>
 #include<fstream>
 #include<istream>
+#include <vector>
+
+#include "Matrix.h"
 #include "Vector.h"
-
 using namespace std;
-
 namespace DataContainers{
 	class String
 	{
@@ -47,24 +48,29 @@ namespace DataContainers{
 			return len;
 		}
 		String Append(const char* str) {
-			const uint32_t len = getLen(str);
+			const uint32_t strtotalLen = getLen(str);
 
-			if (str == nullptr || len == 1)
+			if (str == nullptr || strtotalLen == 1)
 				return *this;
 
-			uint32_t newLen = size == 0? 1 : size-1;
+			uint32_t newLen = 0;
 
-			newLen += len;
+			if (size == 0)
+				newLen++;
+			else
+				newLen += size - 1;
+
+			newLen += strtotalLen;
 
 			char* newData = new char[newLen];
 
 			for (uint32_t i = 0; i < size; i++)
 				newData[i] = this->data[i];
 
-			for (uint32_t i = 0; i < len; i++)
+			for (uint32_t i = 0; i < strtotalLen; i++)
 				newData[size - 1 + i] = str[i];
 
-			newData[size + len - 1] = '\n';
+			newData[size + strtotalLen - 1] = '\n';
 			return String{ newData };
 		}
 		String Append(const String& str) {
@@ -94,7 +100,7 @@ namespace DataContainers{
 			for (uint32_t i = 0; i < size; i++)
 				result[i] = data[i];
 
-			return result;
+			return data;
 		}
 		uint32_t Len() const {
 			return size;
@@ -126,6 +132,7 @@ namespace DataContainers{
 
 			return in;
 		}
+
 
 		void operator+=(const char* str) {
 			const int oldLen = size;
@@ -180,20 +187,20 @@ namespace DataContainers{
 		char* operator+(const char* str) {
 			const uint32_t oldLen = size;
 			if (size == 0) size++;
-			size += getLen(str);
+			size += (String::getLen(str) - 1);
 
-			char* newData = new char[size];
+			char* NewData = new char[size];
 
 			uint32_t i = 0;
 			if (oldLen != 0)
 				for (; i < oldLen - 1; i++)
-					newData[i] = data[i];
+					NewData[i] = data[i];
 
 
 			for (uint32_t j = 0; i < size; i++, j++)
-				newData[i] = str[j];
+				NewData[i] = str[j];
 
-			return newData;
+			return NewData;
 		}
 		String operator+(const String& str) {
 			int oldLen = size;
@@ -213,45 +220,32 @@ namespace DataContainers{
 			return String(NewData);
 		}
 		String& operator=(const char* str) {
-			uint32_t newSize = getLen(str)+1;
+			size = getLen(str);
 
 			Ñlear();
 
-			data = new char[newSize];
-			for (uint32_t i = 0; i < newSize; i++)
+			data = new char[size];
+			for (uint32_t i = 0; i < size; i++)
 				data[i] = str[i];
 
-			size = newSize;
 			return *this;
 		}
 		String& operator=(const String& str) {
-			if (this == &str)
-				return *this;
-
-			const uint32_t newSize = str.Len();
+			size = str.Len();
 
 			Ñlear();
 
-			this->data = new char[newSize];
+			this->data = new char[size];
 			for (uint32_t i = 0; i < size; i++)
 				this->data[i] = str.data[i];
 
-			size = newSize;
 			return *this;
 		}
 
-		bool operator==(const String& str) const {
-			if (size != str.size)
-				return false;
-			for (size_t i = 0; i < size; i++)
-				if (data[i] != str[i])
-					return false;
-			return true;
-		}
 
 		// Based on Levenshtein distance algorithm
 		// Return similarity between strings in percentage from 0 to 100
-		uint32_t Similarity(const String& str) const {
+		uint32_t Similarity(const String& str) {
 			auto string1 = CStr();
 			auto string2 = str.CStr();
 
@@ -267,6 +261,8 @@ namespace DataContainers{
 			for (uint32_t i = 0; i < len1 + 1; i++)
 				currentRow.PushBack(i);
 
+			Matrix<uint32_t> m(len2, len1);
+
 			for (size_t i=1; i < len2+1; i++) {
 				Vector<uint32_t> previousRow = currentRow;
 				currentRow[0] = i;
@@ -281,9 +277,13 @@ namespace DataContainers{
 					Vector<uint32_t> tmp({});
 					tmp.Append({ add, del, change });
 					currentRow[j] = tmp.Min();
+					//m.Append(tmp.Min());
+					//m.Print();
+					//cout << "\n\n\n";
 				}
 			}
-			return (1.f - static_cast<float>(currentRow[len1]) / static_cast<float>(len2)) * 100.f;
+			//m.Print();
+			return (1 - static_cast<float>(currentRow[len1]) / len2) * 100;
 		}
 
 	};

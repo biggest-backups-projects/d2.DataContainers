@@ -12,13 +12,9 @@ namespace DataContainers {
 		unsigned int size;
 		unsigned int capacity;
 
-		void setCapacity(int value = 0) {
-			if (value == 0)
-				if (capacity == 0)
-					capacity = 8;
-				else
-					capacity *= 2;
-
+		void setCapacity(int value = -1) {
+			if (value == -1)
+				capacity *= 2;
 
 			type* newData = new type[capacity];
 
@@ -31,9 +27,8 @@ namespace DataContainers {
 			data = newData;
 		}
 	public:
-		Vector(unsigned int capacity = 8) {
-			this->capacity = capacity;
-			size = 0;
+		Vector(unsigned int capacity = 8) :
+			capacity(capacity),	size(0) {
 			data = new type[capacity];
 		}	
 		Vector(const Vector<type>& list) : Vector(list.Size()) {
@@ -48,22 +43,6 @@ namespace DataContainers {
 			Clear();
 		}
 
-		Vector& operator=(const std::initializer_list<type>& list){
-			if (size)
-				Clear();
-			for (const auto& elem : list)
-				PushBack(elem);
-			return *this;
-		}
-		Vector& operator=(const Vector<type>& list) {
-			if(this == &list) return *this;
-
-			if (size)
-				Clear();
-			for (const auto& elem : list)
-				PushBack(elem);
-			return *this;
-		}
 
 		void Append(const std::initializer_list<type> _arr) {
 			for (const auto& elem : _arr)
@@ -72,7 +51,22 @@ namespace DataContainers {
 		void Append(const type data) {
 			PushBack(data);
 		}
-
+		type Min() {
+			type res = data[0];
+			for (size_t i = 1; i < size; i++) {
+				if (data[i] < res)
+					res = data[i];
+			}
+			return res;
+		}
+		type Max() {
+			type res = data[0];
+			for (size_t i = 1; i < size; i++) {
+				if (data[i] > res)
+					res = data[i];
+			}
+			return res;
+		}
 
 		void PushBack(const type elem) {
 			if (size == capacity)
@@ -196,7 +190,6 @@ namespace DataContainers {
 		type& operator[](unsigned ind) const {
 			return At(ind);
 		}
-
 		void Remove(unsigned ind) {
 			assert(ind < size && "Index out of range");
 
@@ -223,28 +216,12 @@ namespace DataContainers {
 			return data + size;
 		}
 
-		type Min() {
-			type res = data[0];
-			for (size_t i = 1; i < size; i++) {
-				if (data[i] < res)
-					res = data[i];
-			}
-			return res;
-		}
-		type Max() {
-			type res = data[0];
-			for (size_t i = 1; i < size; i++) {
-				if (data[i] > res)
-					res = data[i];
-			}
-			return res;
-		}
 
 		void Clear() {
 			delete[] data;
 			data = nullptr;
 			size = 0;
-			capacity = 0;
+
 		}
 		bool Empty() const {
 			return size == 0;

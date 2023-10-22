@@ -26,6 +26,37 @@ namespace DataContainers {
 		Node* NodeAt(int ind, int curr = 0, Node* elem = nullptr);
 
 	public:
+
+		struct LinkedListIterator {
+			Node* node;
+
+			LinkedListIterator() {
+				node = nullptr;
+			}
+
+			LinkedListIterator(Node* node) {
+				this->node = node;
+			}
+
+			void operator++() {
+				node = node->Next;
+			}
+			bool operator!=(const LinkedListIterator& iterator) const {
+				return node != iterator.node;
+			}
+			type& operator*() {
+				return node->Data;
+			}
+		};
+
+		LinkedListIterator begin() const {
+			return head;
+		}
+
+		LinkedListIterator end() const {
+			return nullptr;
+		}
+
 		LinkedList() {
 			size = 0;
 			head = nullptr;
@@ -83,7 +114,7 @@ namespace DataContainers {
 	template <typename type>
 	typename LinkedList<type>::Node* LinkedList<type>::NodeAt(int ind, int curr, Node* elem)
 	{
-	#ifdef Recurs_func
+	#ifdef RECURSION
 			if (ind == 0)
 				return head;
 
@@ -115,7 +146,7 @@ namespace DataContainers {
 
 	template<typename type>
 	type LinkedList<type>::Pop(int ind) {
-#ifdef Recurs_func
+#ifdef RECURSION
 		if (ind == 0)
 			return PopFront();
 		else if (pos == 0) elem = head;
@@ -254,7 +285,7 @@ namespace DataContainers {
 	template<typename type>
 	type& LinkedList<type>::At(unsigned int ind, unsigned int curr, Node* elem) {
 		assert(ind <= size && "Index out of range");
-#ifdef Recurs_func
+#ifdef RECURSION
 		if (ind == 0)
 			return head->data;
 

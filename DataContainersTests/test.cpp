@@ -1,5 +1,8 @@
 #include "pch.h"
 #include "../../DataContainers/Vector.h"
+#include "../../DataContainers/List.h"
+#include "../../DataContainers/LinkedList.h"
+
 using namespace DataContainers;
 
 TEST(VectorTests, ReadData) {
@@ -19,7 +22,29 @@ TEST(VectorTests, InsertData) {
 	EXPECT_EQ(vector.Size(), 10);
 }
 
-TEST(VectorTests, DeleteData)
-{
-	
+TEST(ListTests, Iteration) {
+	List<int> list;
+	for (size_t i = 0; i < 10; i++) {
+		list.PushBack(i);
+	}
+
+	int i = 0;
+	for(const auto& elem : list) {
+		EXPECT_EQ(elem, i);
+		i++;
+	}
+}
+
+
+TEST(LinkedListTests, Iteration) {
+	LinkedList<int> list;
+	for (size_t i = 0; i < 10; i++) {
+		list.PushBack(i);
+	}
+
+	int i = 0;
+	for (const auto& elem : list) {
+		EXPECT_EQ(elem, i);
+		i++;
+	}
 }

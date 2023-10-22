@@ -50,7 +50,7 @@ namespace DataContainers {
 			if (ind == size - 1)
 				return tail;
 
-		#ifdef Recurs_func
+		#ifdef RECURSION
 			if (curr == ind)
 				return node;
 
@@ -94,25 +94,35 @@ namespace DataContainers {
 		#endif
 		}
 	public:
-		struct Iterator
-		{
-			using iterator_category = std::forward_iterator_tag;
-			using difference_type = std::ptrdiff_t;
-			using value_type = type;
-			using pointer = type*;
-			using reference = type&;
+		struct ListIterator {
+			Node* node;
 
-			Iterator(pointer ptr) : m_ptr(ptr) {}
+			ListIterator() {
+				node = nullptr;
+			}
 
-		
-			pointer operator->() { return m_ptr; }
-			Iterator& operator++() { m_ptr = m_ptr->Next; return *this; }
-			friend bool operator== (const Iterator& a, const Iterator& b) { return a.m_ptr == b.m_ptr; };
-			friend bool operator!= (const Iterator& a, const Iterator& b) { return a.m_ptr != b.m_ptr; };
+			ListIterator(Node* node) {
+				this->node = node;
+			}
 
-		private:
-			Node* m_ptr;
+			void operator++() {
+				node = node->Next;
+			}
+			bool operator!=(const ListIterator& iterator) const {
+				return node != iterator.node;
+			}
+			type& operator*() {
+				return node->Data;
+			}
 		};
+
+		ListIterator begin() const {
+			return head;
+		}
+
+		ListIterator end() const {
+			return nullptr;
+		}
 
 		List() {
 			this->head = nullptr;
@@ -128,15 +138,14 @@ namespace DataContainers {
 		~List() {
 			Clear();
 		}
-
-		Iterator begin() { return Iterator(&head); }
-		Iterator end() { return Iterator(&tail); }
-
 	
 		void PushBack(const type& elem);
 		void PushBack(const List<type>& lst);
 		void PushFront(const type& elem);
 		void Insert(const type& elem, unsigned int ind);
+		void Append(const type& elem) {
+			PushBack(elem);
+		}
 
 		void ForEach(const function<void(type)>& function);
 		List<type> Filter(const function<bool(type)>& predicate);
@@ -163,14 +172,6 @@ namespace DataContainers {
 			size++;
 			return;
 		}
-
-
-		//if (tail == nullptr) {
-		//	this->tail = new Node(this->head, nullptr, elem);
-		//	this->head->Next = tail;
-		//	size++;
-		//	return;
-		//}
 
 		Node* current = (tail == nullptr) ?  head : tail;
 		Node* newElem = new Node(current, nullptr, elem);
@@ -360,7 +361,7 @@ namespace DataContainers {
 	template<typename type>
 	type List<type>::At(unsigned int ind, unsigned int curr, Node* node) const {
 		assert(ind >= 0 && ind <= size - 1 && "Invalid indition to insert");
-	#ifdef Recurs_func
+	#ifdef RECURSION
 
 		if (ind == 0)
 			return head->Data;

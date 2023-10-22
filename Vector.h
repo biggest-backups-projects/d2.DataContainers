@@ -15,6 +15,8 @@ namespace DataContainers {
 		void setCapacity(int value = -1) {
 			if (value == -1)
 				capacity *= 2;
+			if (capacity == 0)
+				capacity = 8;
 
 			type* newData = new type[capacity];
 

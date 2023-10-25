@@ -14,7 +14,7 @@ namespace DataContainers {
 		keyType Key;
 		valueType Value;
 
-		Pair(keyType key, valueType value) {
+		Pair(const keyType& key, const valueType& value) {
 			this->Key = key;	
 			this->Value = value;
 		}
@@ -244,11 +244,6 @@ namespace DataContainers {
 			Pair<keyType, valueType>& operator*() {
 				return nodes[position]->Data;
 			}
-
-
-
-
-
 		};
 
 		Dictionary() {
@@ -468,13 +463,17 @@ namespace DataContainers {
 			if (!node)
 				node = root;
 
+			if(key == node->Data.Key)
+				return true;
+
 			if (node->Left && Contains(key, node->Left))
 				return true;
 
 			if (node->Right && Contains(key, node->Right))
 				return true;
 
-			return key == node->Data.Key;
+			return false;
+
 		}
 
 		valueType& At(const keyType& key, Node* node = nullptr) {
@@ -503,8 +502,6 @@ namespace DataContainers {
 		DictionaryIterator end() const {
 			return size;
 		}
-
-
 	};
 }
 

@@ -624,8 +624,7 @@ namespace DataContainers {
 	                    std::swap(augmented.data[i][j], augmented.data[nonZeroRow][j]);
 	            }
 
-				augmented.Print();
-				cout << "\n\n";
+
 
 	            type divisor = augmented.data[i][i];
 	            for (int j = 0; j < columns * 2; ++j)

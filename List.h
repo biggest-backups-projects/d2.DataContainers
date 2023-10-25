@@ -150,6 +150,16 @@ namespace DataContainers {
 		void ForEach(const function<void(type)>& function);
 		List<type> Filter(const function<bool(type)>& predicate);
 
+		type Reduce(std::function<type(type, type)> func) {
+			type startVal = head->Data;
+			Node* node = head->Next;
+			for (;node != nullptr;) {
+				startVal = func(startVal, node->Data);
+				node = node->Next;
+			}
+			return startVal;
+		}
+
 		type PopBack();
 		type PopFront();
 		type Pop(unsigned int ind);

@@ -50,9 +50,19 @@ namespace DataContainers {
 			for (const auto& elem : _arr)
 				PushBack(elem);
 		}
+
 		void Append(const type data) {
 			PushBack(data);
 		}
+
+		type Reduce(std::function<type(type, type)> func) {
+			type startVal = data[0];
+			for (size_t i = 1; i < size; i++) {
+				startVal = func(startVal, data[i]);
+			}
+			return startVal;
+		}
+
 		type Min() {
 			type res = data[0];
 			for (size_t i = 1; i < size; i++) {

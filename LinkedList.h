@@ -83,6 +83,16 @@ namespace DataContainers {
 
 		void ForEach(const function<void(type&)>& function);
 		LinkedList<type> Filter(const function<bool(type)>& function);
+		type Reduce(std::function<type(type, type)> function) {
+			type startVal = head->Data;
+			Node* node = head->Next;
+			for (; node != nullptr;) {
+				startVal = function(startVal, node->Data);
+				node = node->Next;
+			}
+			return startVal;
+		}
+
 
 		type& operator[](unsigned int ind);
 
@@ -93,6 +103,7 @@ namespace DataContainers {
 
 
 		LinkedList& operator=(const LinkedList<type>& _arr) {
+			if (this == &_arr) return *this;
 			Node* tmp = _arr.head;
 			size = 0;
 			for (size_t i = 0; i < _arr.size(); i++) {

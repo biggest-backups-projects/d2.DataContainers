@@ -274,15 +274,13 @@ namespace DataContainers{
 					if (string1[j - 1] != string2[i - 1])
 						change += 1;
 
-					Vector<uint32_t> tmp({});
-					tmp.Append({ add, del, change });
-					currentRow[j] = tmp.Min();
-					//m.Append(tmp.Min());
-					//m.Print();
-					//cout << "\n\n\n";
+					Vector<uint32_t> tmp = { add, del, change };
+					currentRow[j] = tmp.Reduce([](uint32_t a, uint32_t b)
+					{
+						return std::min(a, b);
+					});
 				}
 			}
-			//m.Print();
 			return (1 - static_cast<float>(currentRow[len1]) / len2) * 100;
 		}
 

@@ -8,8 +8,8 @@ namespace DataContainers
 	class StringBuilder
 	{
 	private:
-		char** data;
-		uint32_t size;  // Number of substrings
+		char** data;		 
+		uint32_t size;		// Number of substrings
 		uint32_t capacity;
 		uint32_t totalLen;  // Len of result string 
 
@@ -35,7 +35,6 @@ namespace DataContainers
 			return res;
 		}
 	public:
-
 		StringBuilder(uint32_t capacity = 8) {
 			this->capacity = capacity;
 			data = new char*[this->capacity];
@@ -51,7 +50,6 @@ namespace DataContainers
 			size = 0;
 			delete[] data;
 		}
-
 		void Clear() {
 			for (int i = 0; i < size; i++) {
 				delete[] data[i];
@@ -63,7 +61,6 @@ namespace DataContainers
 			data = new char* [this->capacity];
 			size = 0;
 		}
-
 		void Append(const char* string, bool endLine = false) {
 			int len = getLen(string);
 
@@ -113,7 +110,6 @@ namespace DataContainers
 		uint32_t Capacity() const {
 			return capacity;
 		}
-		
 		String ToString() const {
 			char* result = new char[totalLen + 1];
 			uint32_t current = 0;

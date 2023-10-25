@@ -18,6 +18,8 @@ namespace DataContainers {
 			this->Key = key;	
 			this->Value = value;
 		}
+
+		Pair() { }
 	};
 
 	template<typename keyType, typename valueType>
@@ -202,6 +204,53 @@ namespace DataContainers {
 				forEach(vector, node->Right);
 		}
 	public:
+		class DictionaryIterator {
+		private:
+			Vector<Node*> nodes;
+
+			void searchNodes(Vector<Node*>& vector, Node* node) const {
+				if(node == nullptr)
+					return;
+
+				if (node->Left)
+					searchNodes(vector, node->Left);
+
+				vector.PushBack(node);
+
+				if (node->Right)
+					searchNodes(vector, node->Right);
+			}
+
+		public:
+			uint32_t position;
+
+			DictionaryIterator(Node* head) {
+				searchNodes(nodes, head);
+				position = 0;
+			}
+
+			DictionaryIterator(uint32_t size) {
+				position = size;
+			}
+
+			void operator++() {
+				position += 1;
+			}
+
+			bool operator!=(const DictionaryIterator& iterator) const {
+				return position != iterator.position;
+			}
+
+			Pair<keyType, valueType>& operator*() {
+				return nodes[position]->Data;
+			}
+
+
+
+
+
+		};
+
 		Dictionary() {
 			root = nullptr;
 			size = 0;
@@ -446,6 +495,16 @@ namespace DataContainers {
 		valueType& operator[](keyType key) {
 			return At(key);
 		}
+
+		DictionaryIterator begin() const {
+			return root;
+		}
+
+		DictionaryIterator end() const {
+			return size;
+		}
+
+
 	};
 }
 

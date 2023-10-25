@@ -35,7 +35,6 @@ TEST(ListTests, Iteration) {
 	}
 }
 
-
 TEST(LinkedListTests, Iteration) {
 	LinkedList<int> list;
 	for (size_t i = 0; i < 10; i++) {

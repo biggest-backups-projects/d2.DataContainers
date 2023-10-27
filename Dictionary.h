@@ -493,7 +493,7 @@ namespace DataContainers {
 
 		valueType& operator[](keyType key) {
 			return At(key);
-		}
+		}   
 
 		DictionaryIterator begin() const {
 			return root;

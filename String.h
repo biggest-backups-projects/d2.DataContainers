@@ -4,9 +4,9 @@
 #include<fstream>
 #include<istream>
 #include <vector>
-
 #include "Matrix.h"
 #include "Vector.h"
+
 using namespace std;
 namespace DataContainers{
 	class String
@@ -222,8 +222,6 @@ namespace DataContainers{
 		String& operator=(const char* str) {
 			size = getLen(str);
 
-			Ñlear();
-
 			data = new char[size];
 			for (uint32_t i = 0; i < size; i++)
 				data[i] = str[i];
@@ -232,8 +230,6 @@ namespace DataContainers{
 		}
 		String& operator=(const String& str) {
 			size = str.Len();
-
-			Ñlear();
 
 			this->data = new char[size];
 			for (uint32_t i = 0; i < size; i++)
@@ -284,6 +280,37 @@ namespace DataContainers{
 			return (1 - static_cast<float>(currentRow[len1]) / len2) * 100;
 		}
 
+		Vector<String> Split(const char separator = ' ', const bool emptyElements = true) const {
+			Vector<String> result;
+
+			uint32_t lastIDX = 0;
+			for (uint32_t i = 0; i < size; i++) {
+
+				if(lastIDX == i && emptyElements && i != 0 && data[i] == separator) {
+					result.Append("");
+					lastIDX += 1;
+					continue;
+				}
+				if((data[i] == separator && i != 0) ||
+				   (data[i] != separator && i == size - 1)) {
+
+					const auto len = i - lastIDX;
+					char* prev = new char[len + 1];
+
+					for (uint32_t k = lastIDX, ind = 0; k < i; k++, ind++)
+						prev[ind] = data[k];
+					
+					prev[len] = '\0';
+					result.Append(String(prev));
+					lastIDX = i + 1;
+				}
+				else if (data[i] == separator && i == 0) {
+					lastIDX += 1;
+				}
+			}
+
+			return result;
+		}
 	};
 
 	

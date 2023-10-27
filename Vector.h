@@ -24,7 +24,7 @@ namespace DataContainers {
 				for (unsigned int i = 0; i < size; i++)
 					newData[i] = data[i];
 
-				delete data;
+				delete[] data;
 			}
 			data = newData;
 		}
@@ -51,7 +51,7 @@ namespace DataContainers {
 				PushBack(elem);
 		}
 
-		void Append(const type data) {
+		void Append(const type& data) {
 			PushBack(data);
 		}
 
@@ -80,7 +80,7 @@ namespace DataContainers {
 			return res;
 		}
 
-		void PushBack(const type elem) {
+		void PushBack(const type& elem) {
 			if (size == capacity)
 				setCapacity();
 

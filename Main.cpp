@@ -8,25 +8,13 @@ using namespace DataContainers;
 int main() {
 	srand(time(0));
 
-	Vector<int> kv = { 54, 32, 55, 22, 2, 1, 6, 9, 88 };
-	Vector<int> lst = { 54, 32, 55, 22, 2, 1, 6, 9, 88 };
-	Dictionary<int, int> dict;
+	String aboba(" ab  ob a      ");
 
-	for(const auto& elem : kv)
-		dict.Insert(elem, elem);
+	auto i = aboba.Split();
 
-	cout << kv.Reduce([](int a, int b)
-		{
-			return std::max(a, b);
-		}) << endl;
+	for (const auto& elem : i) {
+		cout << elem << endl;
+	}
 
-	cout << lst.Reduce([](int a, int b)
-		{
-			return std::max(a, b);
-		}) << endl;
-
-
-	for (const auto& [key, value] : dict)
-		cout << key << " ";
 
 }

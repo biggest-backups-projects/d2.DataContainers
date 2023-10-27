@@ -4,7 +4,6 @@
 #include<fstream>
 #include<istream>
 #include <vector>
-#include "Matrix.h"
 #include "Vector.h"
 
 using namespace std;
@@ -257,8 +256,6 @@ namespace DataContainers{
 			for (uint32_t i = 0; i < len1 + 1; i++)
 				currentRow.PushBack(i);
 
-			Matrix<uint32_t> m(len2, len1);
-
 			for (size_t i=1; i < len2+1; i++) {
 				Vector<uint32_t> previousRow = currentRow;
 				currentRow[0] = i;
@@ -284,13 +281,14 @@ namespace DataContainers{
 			Vector<String> result;
 
 			uint32_t lastIDX = 0;
-			for (uint32_t i = 0; i < size; i++) {
-
-				if(lastIDX == i && emptyElements && i != 0 && data[i] == separator) {
-					result.Append("");
+			for (uint32_t i = 0; i < size-1; i++) {
+				if(i != 0 && data[i - 1] == separator && data[i] == separator) {
+					if(emptyElements)
+						result.Append("");
 					lastIDX += 1;
 					continue;
 				}
+
 				if((data[i] == separator && i != 0) ||
 				   (data[i] != separator && i == size - 1)) {
 

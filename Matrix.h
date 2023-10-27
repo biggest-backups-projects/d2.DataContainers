@@ -1,6 +1,7 @@
 ﻿#pragma once
 #define NOMINMAX
 #include <iomanip>
+#include "String.h"
 #include <iostream>
 #include <Windows.h>
 #include <string>
@@ -8,6 +9,7 @@
 #include <optional>
 #include <format>
 #include "Vector.h"
+
 using namespace std;
 
 namespace DataContainers {
@@ -64,7 +66,7 @@ namespace DataContainers {
 
 			this->rows = row;
 			this->columns = col;
-			this->currCol = row-1;
+			this->currCol = row - 1;
 			this->currRow = col - 1;
 		}
 		Matrix(type* data, unsigned int row, unsigned int col) : Matrix(row, col) {
@@ -78,12 +80,12 @@ namespace DataContainers {
 		}
 
 		void Append(type elem) {
-			if(currCol+1 <= columns-1) {
+			if (currCol + 1 <= columns - 1) {
 				currCol += 1;
 				data[currRow][currCol] = elem;
 			}
 			else {
-				if (currRow + 1 <= rows-1) {
+				if (currRow + 1 <= rows - 1) {
 					data[currRow + 1][0] = elem;
 					currRow += 1;
 					currCol = 0;
@@ -188,7 +190,7 @@ namespace DataContainers {
 			//first.Print();
 			//cout << "\n\n\n";
 			//second.Print();
-		
+
 
 			Matrix<type> tmp(first.rows, first.columns);
 
@@ -198,7 +200,7 @@ namespace DataContainers {
 					cout << "\n\n";*/
 					tmp.data[i][j] = first.data[i][j] - second.data[i][j];
 				}
-					
+
 			return tmp;
 		}
 		friend Matrix operator*(const Matrix<type>& first, const Matrix<type>& second) {
@@ -228,7 +230,7 @@ namespace DataContainers {
 			}
 			return tmp;
 		}
-		friend Matrix operator*( Matrix<type>& second, type num) {
+		friend Matrix operator*(Matrix<type>& second, type num) {
 			Matrix<type> tmp(second.rows, second.columns);
 
 			for (size_t i = 0; i < tmp.rows; i++) {
@@ -239,7 +241,7 @@ namespace DataContainers {
 			}
 			return tmp;
 		}
-		friend Matrix operator/(const Matrix<type>&first,const Matrix<type>&second) {
+		friend Matrix operator/(const Matrix<type>& first, const Matrix<type>& second) {
 			assert((first.columns == second.rows) && "Matrix sizes do not match");
 
 			Matrix<type> tmp(first.rows, second.columns);
@@ -274,18 +276,18 @@ namespace DataContainers {
 			}
 			return *this;
 		}
-		friend bool operator==(Matrix<type>&first, Matrix<type>&second)	{
+		friend bool operator==(Matrix<type>& first, Matrix<type>& second) {
 			if (first.rows != second.rows || first.columns != second.columns) return false;
 
 			for (size_t i = 0; i < first.rows; i++) {
 				for (size_t j = 0; j < first.columns; j++)
 					if (first.data[i][j] != second.data[i][j])
 						return false;
-				
+
 			}
 			return true;
 		}
-		friend bool operator!=(Matrix<type>&first, Matrix<type>&second)	{
+		friend bool operator!=(Matrix<type>& first, Matrix<type>& second) {
 			if (first.rows != second.rows || first.columns != second.columns)
 				return true;
 
@@ -320,11 +322,11 @@ namespace DataContainers {
 			for (size_t i = 0; i < rows; i++) {
 				for (size_t j = 0; j < columns; j++)
 					cout << setw(MaxSize(data, rows, columns) + space)
-						 << data[i][j];
+					<< data[i][j];
 				cout << endl;
 				for (size_t j = 0; j < height; j++)
 					cout << endl;
-			
+
 			}
 		}
 		Matrix<type> Transposition() {
@@ -339,14 +341,14 @@ namespace DataContainers {
 		}
 		// Request user input in console
 		void KbInput(int posX = -1, int posY = -1) {
-			if(posX == -1 || posY == -1) {
+			if (posX == -1 || posY == -1) {
 				HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 				CONSOLE_SCREEN_BUFFER_INFO cbsi;
 				GetConsoleScreenBufferInfo(h, &cbsi);
 				posX = cbsi.dwCursorPosition.X;
 				posY = cbsi.dwCursorPosition.Y;
 			}
-			
+
 
 			for (size_t i = 0; i < rows; i++) {
 				COORD coord;
@@ -362,7 +364,7 @@ namespace DataContainers {
 						data[i][j] = tmp;
 
 						int size_tmpElem = to_string(tmp).size();
-						if (cin.fail())	{
+						if (cin.fail()) {
 							cin.clear();
 							cin.ignore(32767, '\n');
 							SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
@@ -403,7 +405,7 @@ namespace DataContainers {
 			data = NewData;
 			rows--;
 		}
-		void DeleteColumn(int pos =-1) {
+		void DeleteColumn(int pos = -1) {
 			if (pos == -1) pos = columns - 1;
 			assert(pos >= 0 && pos <= columns - 1);
 
@@ -425,7 +427,7 @@ namespace DataContainers {
 			Delete(data, rows);
 			data = NewData;
 			columns--;
-	
+
 		}
 		void AddRow(type* elem, int pos = -1) {
 			assert(pos >= -1 || pos < rows);
@@ -542,11 +544,11 @@ namespace DataContainers {
 			for (size_t i = 1; i < degree; i++)
 				result = result * result;
 			return result;
-			
+
 		}
 		type Determinant(type** data = nullptr, int row = 0, int col = 0) {
 			assert(row == col && row >= 0 && col >= 0);
-			if(!data) {
+			if (!data) {
 				data = this->data;
 				row = rows;
 				col = columns;
@@ -555,19 +557,19 @@ namespace DataContainers {
 			if (row == 2 && col == 2)
 				return (data[0][0] * data[1][1]) - (data[0][1] * data[1][0]);
 
-			
+
 
 			type** newData = nullptr;
 			Matrix<type>::Initialize(newData, row - 1, col - 1);
 
 			type result = 0;
 			for (size_t i = 0; i < col; i++) {
-				
+
 				int r = 0, c = 0;
 				// create sub matrix
 				for (size_t k = 1; k < row; ++k)
 					for (size_t j = 0; j < col; ++j) {
-						if(j !=  i) {
+						if (j != i) {
 							newData[r][c] = data[k][j];
 
 							c += 1;
@@ -575,7 +577,7 @@ namespace DataContainers {
 								c = 0;
 								r += 1;
 							}
-								
+
 						}
 					}
 			}
@@ -585,7 +587,7 @@ namespace DataContainers {
 
 			Vector<type> result(rows * columns);
 
-			for (size_t i = 0; i < currRow+1; i++) {
+			for (size_t i = 0; i < currRow + 1; i++) {
 				for (size_t j = 0; j < columns; j++) {
 					result.PushBack(data[i][j]);
 					if (currRow == i && j == currCol)
@@ -593,61 +595,64 @@ namespace DataContainers {
 				}
 			}
 			return result;
-			
+
 		}
+
 		//Gauss-Jordan method for calculate invesrse matrix
-	    Matrix<type> Inverse() {
-	        assert(rows == columns);
+		Matrix<type> Inverse() {
+			assert(rows == columns);
 
-	        Matrix<type> augmented(rows, columns * 2);
+			Matrix<type> augmented(rows, columns * 2);
 
-	        for (int i = 0; i < rows; ++i)
-	            for (int j = 0; j < columns; ++j) {
-	                augmented.data[i][j] = data[i][j];
-	                augmented.data[i][j + columns] = (i == j) ? 1 : 0;
-	            }
+			for (int i = 0; i < rows; ++i)
+				for (int j = 0; j < columns; ++j) {
+					augmented.data[i][j] = data[i][j];
+					augmented.data[i][j + columns] = (i == j) ? 1 : 0;
+				}
 
-	        for (int i = 0; i < rows; ++i) {
-	         
-	            if (augmented.data[i][i] == 0) {
-	                int nonZeroRow = -1;
+			for (int i = 0; i < rows; ++i) {
 
-	                for (int k = i + 1; k < rows; ++k)
-	                    if (augmented.data[k][i] != 0) {
-	                        nonZeroRow = k;
-	                        break;
-	                    }
+				if (augmented.data[i][i] == 0) {
+					int nonZeroRow = -1;
 
-	                assert(nonZeroRow != -1); // Матрица вырожденная
+					for (int k = i + 1; k < rows; ++k)
+						if (augmented.data[k][i] != 0) {
+							nonZeroRow = k;
+							break;
+						}
 
-	                for (int j = 0; j < columns * 2; ++j)
-	                    std::swap(augmented.data[i][j], augmented.data[nonZeroRow][j]);
-	            }
+					assert(nonZeroRow != -1); // Матрица вырожденная
 
-
-
-	            type divisor = augmented.data[i][i];
-	            for (int j = 0; j < columns * 2; ++j)
-	                augmented.data[i][j] /= divisor;
-
-	            // Обнуляем все элементы в столбце, кроме текущего
-	            for (int k = 0; k < rows; ++k)
-	                if (k != i) {
-	                    type factor = augmented.data[k][i];
-	                    for (int j = 0; j < columns * 2; ++j)
-	                        augmented.data[k][j] -= factor * augmented.data[i][j];
-	                }
-				
-	        }
+					for (int j = 0; j < columns * 2; ++j)
+						std::swap(augmented.data[i][j], augmented.data[nonZeroRow][j]);
+				}
 
 
 
-	        Matrix<type> result(rows, columns);
-	        for (int i = 0; i < rows; ++i)
-	            for (int j = 0; j < columns; ++j)
-	                result.data[i][j] = augmented.data[i][j + columns];
+				type divisor = augmented.data[i][i];
+				for (int j = 0; j < columns * 2; ++j)
+					augmented.data[i][j] /= divisor;
 
-	        return result;
-	    }
+				// Обнуляем все элементы в столбце, кроме текущего
+				for (int k = 0; k < rows; ++k)
+					if (k != i) {
+						type factor = augmented.data[k][i];
+						for (int j = 0; j < columns * 2; ++j)
+							augmented.data[k][j] -= factor * augmented.data[i][j];
+					}
+
+			}
+
+
+
+			Matrix<type> result(rows, columns);
+			for (int i = 0; i < rows; ++i)
+				for (int j = 0; j < columns; ++j)
+					result.data[i][j] = augmented.data[i][j + columns];
+
+			return result;
+		}
+
+
 	};
-};
+}

@@ -16,6 +16,14 @@ namespace DataContainers{
 		// TODO implement capacity
 		//uint32_t capacity;
 	public:
+		void Clear() {
+			if (data != nullptr) {
+				delete[] data;
+				data = nullptr;
+			}
+			size = 0;
+		}
+
 		String() {
 			data = nullptr;
 			size = 0;
@@ -37,13 +45,13 @@ namespace DataContainers{
 				this->data[i] = str.data[i];
 		}
 		~String() {
-			Ñlear();
+			Clear();
 		}
 
 		static uint32_t getLen(const char* str) {
 			int len = 0;
-			while (str[len] != '\0')
-				len += 1;
+			while (str[len])
+				len++;
 			return len;
 		}
 		String Append(const char* str) {
@@ -69,7 +77,20 @@ namespace DataContainers{
 			for (uint32_t i = 0; i < strtotalLen; i++)
 				newData[size - 1 + i] = str[i];
 
-			newData[size + strtotalLen - 1] = '\n';
+			newData[size + strtotalLen - 1] = '\0';
+			return String{ newData };
+		}
+		String Append(const char c) {
+			uint32_t newLen = size + 1;
+
+			char* newData = new char[newLen];
+
+			for (uint32_t i = 0; i < size; i++)
+				newData[i] = this->data[i];
+
+			newData[size - 1] = c;
+			newData[newLen - 1] = '\0';
+
 			return String{ newData };
 		}
 		String Append(const String& str) {
@@ -83,16 +104,12 @@ namespace DataContainers{
 			newData[size - 1] = '\0';
 			return newData;
 		}
-		void Ñlear() {
-			if (data != nullptr) {
-				delete[] data;
-				data = nullptr;
-			}
-			size = 0;
-		}
+
+
 		bool Empty() const {
 			return size == 0;
 		}
+
 		char* CStr() const {
 			char* result = new char[size];
 
@@ -120,7 +137,7 @@ namespace DataContainers{
 			const uint32_t totalLen = String::getLen(buffer);
 
 			if (!str.Empty())
-				str.Ñlear();
+				str.Clear();
 
 			str.data = new char[totalLen + 1];
 			str.size = totalLen + 1;
@@ -219,7 +236,7 @@ namespace DataContainers{
 			return String(NewData);
 		}
 		String& operator=(const char* str) {
-			size = getLen(str);
+			size = getLen(str) + 1;
 
 			data = new char[size];
 			for (uint32_t i = 0; i < size; i++)
@@ -277,35 +294,30 @@ namespace DataContainers{
 			return (1 - static_cast<float>(currentRow[len1]) / len2) * 100;
 		}
 
-		Vector<String> Split(const char separator = ' ', const bool emptyElements = true) const {
+		Vector<String> Split(const char* separator = " ", const bool emptyElements = true) const {
 			Vector<String> result;
 
-			uint32_t lastIDX = 0;
-			for (uint32_t i = 0; i < size-1; i++) {
-				if(i != 0 && data[i - 1] == separator && data[i] == separator) {
-					if(emptyElements)
-						result.Append("");
-					lastIDX += 1;
+			const auto startsWith = [](const char* s, const char* sep) {
+				for (int i = 0; i < strlen(sep); i++)
+					if (s[i] != sep[i])
+						return false;
+				return true;
+			};
+			
+			String identifierBuffer = "";
+			for (uint32_t i = 0; i < size - 1; i++) {
+				if (startsWith(data + i, separator)) {
+					result.Append(identifierBuffer);
+					identifierBuffer = "";
+
+					i += strlen(separator) - 1;
 					continue;
 				}
-
-				if((data[i] == separator && i != 0) ||
-				   (data[i] != separator && i == size - 1)) {
-
-					const auto len = i - lastIDX;
-					char* prev = new char[len + 1];
-
-					for (uint32_t k = lastIDX, ind = 0; k < i; k++, ind++)
-						prev[ind] = data[k];
-					
-					prev[len] = '\0';
-					result.Append(String(prev));
-					lastIDX = i + 1;
-				}
-				else if (data[i] == separator && i == 0) {
-					lastIDX += 1;
-				}
+				else
+					identifierBuffer = identifierBuffer.Append(data[i]);
 			}
+
+			result.Append(identifierBuffer);
 
 			return result;
 		}

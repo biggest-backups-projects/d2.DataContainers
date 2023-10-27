@@ -1,11 +1,11 @@
 #pragma once
 #include <iostream>
-#include "String.h"	
 #include "Matrix.h"
-#include "Vector.h"
+#include "String.h"
 using namespace std;
 using namespace DataContainers;
 
 int main() {
-
+	for(auto row : String("1, 2, 3, 4").Split(", "))
+		cout << row << '\n';
 }
